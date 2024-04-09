@@ -10,10 +10,10 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 # ======================================================
 
-CLEAR_COMMAND = "clear"
+CLEAR_COMMAND = "cls"
 
 if (platform.system() != "Windows"):
-    CLEAR_COMMAND = "cls" 
+    CLEAR_COMMAND = "clear" 
 
 
 # MARK: - Crypto Engine 
@@ -44,10 +44,17 @@ class CryptoEngine():
 
         return cipher
 
-    def load_file(self) -> str:
-        file_path = input("Enter or Drop File Path: ") 
+    def load_file(self, file_path):
         file_path = file_path.strip('"')
-        return file_path 
+
+        if (os.path.exists(file_path)):
+            print("exists") 
+        else:
+            print('does not exist')
+
+
+
+        return file_path
     
     def prompt_user_for_password(self) -> bytes: 
         password = input("Enter a Password: ")
@@ -94,11 +101,130 @@ class DecryptionEngine(CryptoEngine):
 
         print(file_path_of_encrypted_file_to_be_decrypted)
 
+        decrypted_file_name = os.path.basename(file_path_of_encrypted_file_to_be_decrypted)
+        decrypted_file_name = os.path.splitext(decrypted_file_name)[0]
+
+        print(decrypted_file_name)
+
+        with open(file_path_of_encrypted_file_to_be_decrypted, 'rb') as file: 
+            encrypted_data = file.read() 
+
+            print("decrypt data please enter password")
+            password_bytes = self.prompt_user_for_password()
+
+            decrypted_data = self.hashing(password_bytes).decrypt(encrypted_data)
+
+            with open(decrypted_file_name, 'wb') as d_file:
+                d_file.write(decrypted_data)
+
+
     def run(self): 
         self.__decrypt_data() 
 
 
 
+# MARK: - Utility Engine
+
+class UtilityEngine(): 
+    def __init__(): 
+        pass 
+
+    @staticmethod
+    def get_file_name_out_of_path(file_path: str) -> str: 
+
+        return os.path.basename(file_path)
+    
+    @staticmethod
+    def check_if_path_exists(file_path: str) -> bool: 
+        return os.path.exists(file_path)
+    
+    @staticmethod
+    def clear_terminal():
+        os.system(CLEAR_COMMAND)
+
+
+
+
+
+# MARK: - Compression Engine Terminal UI Prompts
+
+class CompressionEngineTerminalUIView():
+    def __init__(self): 
+        self.engine = CompressionEngine()
+
+
+    def __prompt_menu_display(self, bars_size, msg): 
+        UtilityEngine.clear_terminal() 
+
+        menu_options = (
+            "=" * bars_size + "\n" + 
+            f"{msg}" + 
+            "=" * bars_size + "\n" 
+        )
+
+        print(menu_options)
+
+    def __compression_prompt(self): 
+        msg = "Please Enter a file path or drag file \n"
+        bars_size = len(msg) 
+        self.__prompt_menu_display(bars_size, msg)
+
+        file_path = input("File Path: ")
+
+        file_path = self.engine.load_file(file_path) 
+
+
+        if (UtilityEngine.check_if_path_exists(file_path)): 
+            file_name = UtilityEngine.get_file_name_out_of_path(file_path)
+            msg = "Would you like to proceed in compressing file: "
+            msg += file_name + "\n" 
+            bars_size = len(msg)
+            msg += "[1]: Yes\n"
+            msg += "[2]: No\n"
+
+            user_option = -1 
+
+            while (user_option != 2): 
+                self.__prompt_menu_display(bars_size, msg) 
+
+                user_option = int(input("Enter choice: "))
+
+                if user_option == 1: 
+                    msg = f"compressing file: {file_name}\n"
+
+                    bars_size = len(msg)
+
+                    self.__prompt_menu_display(bars_size, msg) 
+
+                    res = self.engine.compress_directory_to_rar(file_path)
+
+                    print(res) 
+                    input("Press Enter to return to main menu: ")
+
+                    user_option = 2
+        else:
+            print("file does not exist") 
+            input("Press Enter to return to main menu: ")
+
+    def init_prompt(self): 
+        msg = "[1]: Compress Directory to RAR\n" 
+        bars_size = len(msg) 
+        msg += "[4]: Exit\n" 
+
+        user_option = -1 
+
+        while (user_option != 4): 
+            self.__prompt_menu_display(bars_size, msg) 
+            user_option = int(input("Enter Choice: "))
+
+            if (user_option == 1): 
+                self.__compression_prompt()
+            elif (user_option != 4): 
+                UtilityEngine.clear_terminal()
+                print("invalid choice!!! please chooose again") 
+
+    def init__menu(self): 
+        self.init_prompt() 
 
 
 # MARK: - Compression Engine
@@ -107,31 +233,23 @@ class CompressionEngine(CryptoEngine):
     def __init__(self): 
         pass 
 
-    def __compress_directory_to_rar(self):
-        directory_to_compress = r"C:\Users\George Santander\Desktop\Compression\things"
-        output_zip_file = r"C:\Users\George Santander\Desktop\Compression\output.rar"
+    def compress_directory_to_rar(self, file_path) -> str:
+        result = "file compressed successfully...." 
 
-        subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', output_zip_file, directory_to_compress])
+        directory_to_compress = file_path
 
-    def run(self) -> None: 
-        user_option = -1 
+        if (UtilityEngine.check_if_path_exists(directory_to_compress)):
+            output_rar_file = f"{UtilityEngine.get_file_name_out_of_path(directory_to_compress)}.rar"
 
-        os.system(CLEAR_COMMAND)
+            try:
+                subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep', output_rar_file, directory_to_compress])
+            except Exception as e:
+                result = e 
+        else: 
+            result = "Invalid path provided unable to compress file" 
 
-        menu_options = (
-            "====================================\n"
-            "[1]: Compress Directory to RAR\n"
-            "[4]: Exit\n"
-            "Enter Choice: "
-        )
-
-        while (user_option != 4): 
-            user_option = int(input(menu_options))
-            if (user_option == 1): 
-                self.__compress_directory_to_rar() 
-                user_option = 4
-            else:
-                print("Invalid Option")
+        return result 
+        
 
 # MARK: - File Processing Program: 
 
@@ -152,10 +270,10 @@ class FileProcessingProgram():
         menu_options = (
             "====================================\n"
             "[1]: Compression\n"
-            "[2]: Encrypt Data\n",
-            "[3]: Decrypt Data\n", 
+            "[2]: Encrypt Data\n"
+            "[3]: Decrypt Data\n"
             "[4]: Exit\n"
-            "Enter Choice: "
+            ":"
         )
 
         while (user_option != 4):
@@ -166,4 +284,5 @@ class FileProcessingProgram():
                 engine.run()
                 
 if __name__ == "__main__": 
-    DecryptionEngine().run() 
+    # FileProcessingProgram().run_program() 
+    CompressionEngineTerminalUIView().init__menu() 
