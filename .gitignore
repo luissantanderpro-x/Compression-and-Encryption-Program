@@ -1,1 +1,5 @@
+# Ignore Specific Files 
 secret.txt
+
+# Ignore Specfic Directories 
+/testing/
