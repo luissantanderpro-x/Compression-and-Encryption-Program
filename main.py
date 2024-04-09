@@ -131,7 +131,6 @@ class UtilityEngine():
 
     @staticmethod
     def get_file_name_out_of_path(file_path: str) -> str: 
-
         return os.path.basename(file_path)
     
     @staticmethod
@@ -144,8 +143,6 @@ class UtilityEngine():
 
 
 
-
-
 # MARK: - Compression Engine Terminal UI Prompts
 
 class CompressionEngineTerminalUIView():
@@ -153,7 +150,7 @@ class CompressionEngineTerminalUIView():
         self.engine = CompressionEngine()
 
 
-    def __prompt_menu_display(self, bars_size, msg): 
+    def __prompt_menu_display(self, msg="", bars_size=30): 
         UtilityEngine.clear_terminal() 
 
         menu_options = (
@@ -167,7 +164,7 @@ class CompressionEngineTerminalUIView():
     def __compression_prompt(self): 
         msg = "Please Enter a file path or drag file \n"
         bars_size = len(msg) 
-        self.__prompt_menu_display(bars_size, msg)
+        self.__prompt_menu_display(msg, bars_size)
 
         file_path = input("File Path: ")
 
@@ -185,7 +182,7 @@ class CompressionEngineTerminalUIView():
             user_option = -1 
 
             while (user_option != 2): 
-                self.__prompt_menu_display(bars_size, msg) 
+                self.__prompt_menu_display(msg, bars_size) 
 
                 user_option = int(input("Enter choice: "))
 
@@ -194,7 +191,7 @@ class CompressionEngineTerminalUIView():
 
                     bars_size = len(msg)
 
-                    self.__prompt_menu_display(bars_size, msg) 
+                    self.__prompt_menu_display(msg, bars_size) 
 
                     res = self.engine.compress_directory_to_rar(file_path)
 
@@ -214,7 +211,7 @@ class CompressionEngineTerminalUIView():
         user_option = -1 
 
         while (user_option != 4): 
-            self.__prompt_menu_display(bars_size, msg) 
+            self.__prompt_menu_display(msg, bars_size) 
             user_option = int(input("Enter Choice: "))
 
             if (user_option == 1): 
@@ -222,10 +219,6 @@ class CompressionEngineTerminalUIView():
             elif (user_option != 4): 
                 UtilityEngine.clear_terminal()
                 print("invalid choice!!! please chooose again") 
-
-    def init__menu(self): 
-        self.init_prompt() 
-
 
 # MARK: - Compression Engine
 
@@ -250,6 +243,57 @@ class CompressionEngine(CryptoEngine):
 
         return result 
         
+# MARK: - Terminal View
+
+class TerminalView():
+    def __init__(self): 
+        pass 
+
+    def init_prompt(self):
+        pass 
+
+    def _prompt_menu_display(self, msg="", bars_size=30): 
+        UtilityEngine.clear_terminal() 
+
+        menu_options = (
+            "=" * bars_size + "\n" + 
+            f"{msg}" + 
+            "=" * bars_size + "\n" 
+        )
+
+        print(menu_options)
+
+
+
+# MARK: - Main Terminal View
+
+class MainTerminalView(TerminalView):
+    def __init__(self):
+        pass 
+
+    def init_prompt(self):
+        user_option = -1 
+
+        msg = (
+            "[1]: Compression\n"
+            "[4]: Exit\n"
+        )
+
+        engine_view_options = {
+            1: CompressionEngineTerminalUIView
+        }
+
+        while (user_option != 4):
+            self._prompt_menu_display(msg) 
+            user_option = int(input("Enter Choice: "))
+
+            if (user_option == 1): 
+                engine_view = engine_view_options.get(1)()
+                engine_view.init_prompt() 
+            elif (user_option != 4): 
+                input("invalid choice press enter to continue")
+
+
 
 # MARK: - File Processing Program: 
 
@@ -258,31 +302,9 @@ class FileProcessingProgram():
         pass 
 
     def run_program(self) -> None:
-        user_option = -1 
+        MainTerminalView().init_prompt()
 
-        engine_options = {
-            1: CompressionEngine,
-            2: EncryptionEngine,
-            3: DecryptionEngine
-        }
-
-
-        menu_options = (
-            "====================================\n"
-            "[1]: Compression\n"
-            "[2]: Encrypt Data\n"
-            "[3]: Decrypt Data\n"
-            "[4]: Exit\n"
-            ":"
-        )
-
-        while (user_option != 4):
-            user_option = int(input(menu_options))
-
-            if (user_option == 1): 
-                engine = engine_options.get(1)()
-                engine.run()
                 
 if __name__ == "__main__": 
-    # FileProcessingProgram().run_program() 
-    CompressionEngineTerminalUIView().init__menu() 
+    FileProcessingProgram().run_program() 
+    
