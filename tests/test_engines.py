@@ -11,3 +11,9 @@ from engines import CryptoEngine
 class TestCryptoEngines(unittest.TestCase):
     def test_encryption(self):
         self.assertEqual(True, True) 
+
+
+
+    # MARK: - Test Compression Engine 
+    def test_if_compressed_file_exists(self): 
+        pass 

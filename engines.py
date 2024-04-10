@@ -44,9 +44,7 @@ class CryptoEngine():
             print("exists") 
         else:
             print('does not exist')
-
-
-
+            
         return file_path
     
     def prompt_user_for_password(self) -> bytes: 
@@ -83,7 +81,7 @@ class EncryptionEngine(CryptoEngine):
     def __init__(self):
         pass 
     
-    def __encrypt_data(self): 
+    def encrypt_data(self): 
         password_bytes = self.prompt_user_for_password() 
 
         file_path_of_file_to_be_encrypted = self.load_file() 
@@ -101,9 +99,6 @@ class EncryptionEngine(CryptoEngine):
 
             with open(encrypted_file_name, 'wb') as file:
                 file.write(encrypted_data)
-
-    def run(self): 
-        self.__encrypt_data()
 
 # MARK: - Decryption Engine 
 

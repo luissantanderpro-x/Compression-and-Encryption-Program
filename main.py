@@ -1,6 +1,8 @@
 # MARK: - Imports 
 
-from views import MainTerminalView
+# TODO: Change this imports to specfiic imports
+
+from views import *
 
 # MARK: - File Processing Program: 
 
@@ -9,7 +11,8 @@ class FileProcessingProgram():
         pass 
 
     def run_program(self) -> None:
-        MainTerminalView().init_prompt()
+        CompressionEngineTerminalUIView().init_prompt() 
+        # EncryptionTerminalView().init_prompt() 
 
 
 # MARK: - Program Main 
