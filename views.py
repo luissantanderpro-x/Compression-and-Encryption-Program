@@ -146,17 +146,3 @@ class MainTerminalView(TerminalView):
             "[1]: Compression\n"
             "[4]: Exit\n"
         )
-
-        engine_view_options = {
-            1: CompressionEngineTerminalUIView
-        }
-
-        while (user_option != 4):
-            self._prompt_menu_display(msg) 
-            user_option = int(input("Enter Choice: "))
-
-            if (user_option == 1): 
-                engine_view = engine_view_options.get(1)()
-                engine_view.init_prompt() 
-            elif (user_option != 4): 
-                input("invalid choice press enter to continue")

@@ -81,13 +81,9 @@ class EncryptionEngine(CryptoEngine):
     def __init__(self):
         pass 
     
-    def encrypt_data(self): 
-        password_bytes = self.prompt_user_for_password() 
-
-        file_path_of_file_to_be_encrypted = self.load_file() 
-
-        encrypted_file_name = os.path.basename(file_path_of_file_to_be_encrypted)
-
+    def encrypt_data(self, encrypted_password_cipher: Fernet, file_path_of_file_to_be_encrypted): 
+        file_path_of_file_to_be_encrypted = UtilityEngine.process_path(file_path_of_file_to_be_encrypted)
+        encrypted_file_name = UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_be_encrypted)
         encrypted_file_name = f"{encrypted_file_name}.enc"
 
         print(encrypted_file_name)
@@ -95,7 +91,7 @@ class EncryptionEngine(CryptoEngine):
         with open(file_path_of_file_to_be_encrypted, 'rb') as file:
             data = file.read() 
             
-            encrypted_data = self.hashing(password_bytes).encrypt(data)
+            encrypted_data = encrypted_password_cipher.encrypt(data) 
 
             with open(encrypted_file_name, 'wb') as file:
                 file.write(encrypted_data)
@@ -106,27 +102,35 @@ class DecryptionEngine(CryptoEngine):
     def __init__(self): 
         pass 
 
-    def __decrypt_data(self): 
-        file_path_of_encrypted_file_to_be_decrypted = self.load_file() 
+    def decrypt_data(self, encrypted_password_cipher: Fernet, file_path_of_compressed_file_to_be_decrypted):
+        file_path_of_compressed_file_to_be_decrypted = UtilityEngine.process_path(file_path_of_compressed_file_to_be_decrypted)
+        
+        # Check if the path exists 
 
-        print(file_path_of_encrypted_file_to_be_decrypted)
-
-        decrypted_file_name = os.path.basename(file_path_of_encrypted_file_to_be_decrypted)
-        decrypted_file_name = os.path.splitext(decrypted_file_name)[0]
+        decrypted_file_name = UtilityEngine.get_file_name_out_of_path(file_path_of_compressed_file_to_be_decrypted)
 
         print(decrypted_file_name)
+    # def __decrypt_data(self): 
+    #     file_path_of_encrypted_file_to_be_decrypted = self.load_file() 
 
-        with open(file_path_of_encrypted_file_to_be_decrypted, 'rb') as file: 
-            encrypted_data = file.read() 
+    #     print(file_path_of_encrypted_file_to_be_decrypted)
 
-            print("decrypt data please enter password")
-            password_bytes = self.prompt_user_for_password()
+    #     decrypted_file_name = os.path.basename(file_path_of_encrypted_file_to_be_decrypted)
+    #     decrypted_file_name = os.path.splitext(decrypted_file_name)[0]
 
-            decrypted_data = self.hashing(password_bytes).decrypt(encrypted_data)
+    #     print(decrypted_file_name)
 
-            with open(decrypted_file_name, 'wb') as d_file:
-                d_file.write(decrypted_data)
+    #     with open(file_path_of_encrypted_file_to_be_decrypted, 'rb') as file: 
+    #         encrypted_data = file.read() 
+
+    #         print("decrypt data please enter password")
+    #         password_bytes = self.prompt_user_for_password()
+
+    #         decrypted_data = self.hashing(password_bytes).decrypt(encrypted_data)
+
+    #         with open(decrypted_file_name, 'wb') as d_file:
+    #             d_file.write(decrypted_data)
 
 
-    def run(self): 
-        self.__decrypt_data() 
+    # def run(self): 
+    #     self.__decrypt_data() 

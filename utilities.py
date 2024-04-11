@@ -22,5 +22,14 @@ class UtilityEngine():
         return os.path.exists(file_path)
     
     @staticmethod
+    def get_file_name_from_path(file_path: str):
+        return os.path.splitext(file_path)
+    
+    @staticmethod
     def clear_terminal():
         os.system(CLEAR_COMMAND)
+
+    @staticmethod
+    def process_path(file_path): 
+        file_path = file_path.strip('"')
+        return file_path
