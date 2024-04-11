@@ -55,19 +55,19 @@ class CryptoEngine():
         decrypted_text = self.ceasars_cipher_encrypt(string_data, shift * -1)
         return decrypted_text
     
-    def load_file(self, file_path):
-        file_path = file_path.strip('"')
+    # def load_file(self, file_path):
+    #     file_path = file_path.strip('"')
 
-        if (os.path.exists(file_path)):
-            print("exists") 
-        else:
-            print('does not exist')
+    #     if (os.path.exists(file_path)):
+    #         print("exists") 
+    #     else:
+    #         print('does not exist')
             
-        return file_path
+    #     return file_path
     
-    def prompt_user_for_password(self) -> bytes: 
-        password = input("Enter a Password: ")
-        return password.encode('utf-8')
+    # def prompt_user_for_password(self) -> bytes: 
+    #     password = input("Enter a Password: ")
+    #     return password.encode('utf-8')
     
 
 # MARK: - Compression Engine
@@ -76,22 +76,35 @@ class CompressionEngine(CryptoEngine):
     def __init__(self): 
         pass 
 
-    def compress_directory_to_rar(self, file_path) -> str:
+    def create_compressed_files_directory(self, directory_path):
+        compressed_file_directory = os.path.join(directory_path, 'compressed_files_output')
+
+        try: 
+            os.mkdir(compressed_file_directory)
+        except FileExistsError:
+            print("Directory compressed_files_output already exists")
+        except Exception as e:
+            print("Uknown error occurred.....") 
+            
+    def compress_directory_to_rar(self, file_path_of_file_to_compress) -> str:
         result = "file compressed successfully...." 
 
-        directory_to_compress = file_path
-
-        if (UtilityEngine.check_if_path_exists(directory_to_compress)):
-            output_rar_file = f"{UtilityEngine.get_file_name_out_of_path(directory_to_compress)}.rar"
+        if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
+            output_rar_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.rar"
+            output_rar_file_path_placement = os.path.join(os.getcwd(), 'compressed_files_output', output_rar_file_name)
 
             try:
-                subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep', output_rar_file, directory_to_compress])
+                subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep', output_rar_file_path_placement, file_path_of_file_to_compress])
             except Exception as e:
                 result = e 
         else: 
             result = "Invalid path provided unable to compress file" 
 
         return result 
+    
+    @staticmethod
+    def is_file_rar_compressed(file_name: str) -> bool: 
+        return '.rar' in file_name
     
 # MARK: - Encryption Engine
 
@@ -107,7 +120,7 @@ class EncryptionEngine(CryptoEngine):
         return self.encrypt_data(password_bytes, password_bytes) 
     
     def encrypt_file_extension(self, file_name: str): 
-        return self.replace_char_at_index(file_name, -4, 'u')
+        return StringUtilities.replace_char_at_index(file_name, -4, 'u') 
     
     def encrypt_file_name(self, file_name: str): 
         file_name = self.encrypt_file_extension(file_name)
@@ -145,15 +158,6 @@ class DecryptionEngine(CryptoEngine):
         data_bytes = enc_engine.encrypt_password(password)
 
         return self.crypto_hashing_processor(password_bytes, hashes.SHA256).decrypt(data_bytes).decode('utf-8')
-
-    def decrypt_data(self, encrypted_password_cipher: Fernet, file_path_of_compressed_file_to_be_decrypted):
-        file_path_of_compressed_file_to_be_decrypted = UtilityEngine.process_path(file_path_of_compressed_file_to_be_decrypted)
-        
-        # Check if the path exists 
-
-        decrypted_file_name = UtilityEngine.get_file_name_out_of_path(file_path_of_compressed_file_to_be_decrypted)
-
-        print(decrypted_file_name)
 
     def decrypt_file_extension(self, file_name: str):
         return StringUtilities.replace_char_at_index(file_name, -4, '.') 

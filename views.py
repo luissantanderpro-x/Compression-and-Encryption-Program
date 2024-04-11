@@ -115,23 +115,23 @@ class EncryptionTerminalView(TerminalView):
     def __init__(self): 
         self.engine = EncryptionEngine()
 
-    def exit(self): 
-        print("Exiting Encryption Terminal View") 
+    # def exit(self): 
+    #     print("Exiting Encryption Terminal View") 
 
-    def init_prompt(self):
-        print("Encryption Terminal Init Prompot") 
+    # def init_prompt(self):
+    #     print("Encryption Terminal Init Prompot") 
 
-        msg = (
-            "[1]: Encrypt Directory"
-            "[2]: Exit"
-        )
+    #     msg = (
+    #         "[1]: Encrypt Directory"
+    #         "[2]: Exit"
+    #     )
 
-        functions = {
-            1: self.engine.encrypt_data,
-            2: self.exit
-        }
+    #     functions = {
+    #         1: self.engine.encrypt_data,
+    #         2: self.exit
+    #     }
 
-        self._user_selection(msg, functions) 
+    #     self._user_selection(msg, functions) 
 
 # MARK: - Main Terminal View
 
@@ -140,9 +140,10 @@ class MainTerminalView(TerminalView):
         pass 
 
     def init_prompt(self):
-        user_option = -1 
+        pass
+        # user_option = -1 
 
-        msg = (
-            "[1]: Compression\n"
-            "[4]: Exit\n"
-        )
+        # msg = (
+        #     "[1]: Compression\n"
+        #     "[4]: Exit\n"
+        # )

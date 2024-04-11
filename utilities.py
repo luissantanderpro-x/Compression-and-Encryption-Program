@@ -45,14 +45,23 @@ class UtilityEngine():
     def compress_string(uncompressed_string: bytes) -> bytes:
         compressed_string = zlib.compress(uncompressed_string, 9)  
         return compressed_string
-    
+
+
+# MARK: - File Path Processing Utilities 
+
+class FileProcessingUtilities():
+    def __init__(self) -> None:
+        pass
+
+
+# MARK: - String Utilities 
         
 class StringUtilities():
     def __init__(self) -> None:
         pass
 
     @staticmethod
-    def replace_char_at_index(self, string_data: str, index, replacement): 
+    def replace_char_at_index(string_data: str, index, replacement): 
         return string_data[:index] + replacement + string_data[index + 1:]
     
     @staticmethod
