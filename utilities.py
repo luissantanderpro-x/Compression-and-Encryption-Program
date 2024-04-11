@@ -2,6 +2,8 @@
 from dependencies import os
 from dependencies import platform
 
+import zlib
+
 CLEAR_COMMAND = "cls"
 
 if (platform.system() != "Windows"):
@@ -12,6 +14,7 @@ if (platform.system() != "Windows"):
 class UtilityEngine(): 
     def __init__(): 
         pass 
+
 
     @staticmethod
     def get_file_name_out_of_path(file_path: str) -> str: 
@@ -33,3 +36,16 @@ class UtilityEngine():
     def process_path(file_path): 
         file_path = file_path.strip('"')
         return file_path
+    
+    @staticmethod
+    def transform_to_utf_8_bytes_string(s: str) -> bytes:
+        return s.encode('utf-8') 
+    
+    @staticmethod
+    def compress_string(uncompressed_string: bytes) -> bytes:
+        compressed_string = zlib.compress(uncompressed_string, 9)  
+        return compressed_string
+    
+        
+
+

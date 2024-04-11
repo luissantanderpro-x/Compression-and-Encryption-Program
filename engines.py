@@ -3,6 +3,7 @@ from dependencies import os
 from dependencies import base64
 from dependencies import subprocess
 
+
 from utilities import UtilityEngine
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -36,6 +37,46 @@ class CryptoEngine():
         cipher = Fernet(encoded_key)
 
         return cipher
+    
+    def crypto_hashing_processor(self, data_bytes, algorthim):
+        salt = b'salt_value'
+
+        kdf = PBKDF2HMAC(
+            algorithm=algorthim(),
+            length=32,
+            salt=salt,
+            iterations=1000,
+            backend=default_backend()
+        )
+
+        key = kdf.derive(data_bytes)
+
+        encoded_key = base64.urlsafe_b64encode(key) 
+
+        cipher = Fernet(encoded_key)
+
+        return cipher
+    
+    def encrypt_file_name(self, password, file_name: str): 
+
+        password_bytes = UtilityEngine.transform_to_utf_8_bytes_string(password)
+        
+        cipher = self.crypto_hashing_processor(password_bytes, hashes.MD5) 
+
+
+        file_name_bytes = UtilityEngine.transform_to_utf_8_bytes_string(file_name)
+
+    
+        encrypted_file_name_bytes = cipher.encrypt(file_name_bytes) 
+        compressed_encrypted_file_name = UtilityEngine.compress_string(encrypted_file_name_bytes)
+
+        print(encrypted_file_name_bytes)
+        print(compressed_encrypted_file_name)
+
+        print(cipher.decrypt(encrypted_file_name_bytes))
+
+
+        return "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     def load_file(self, file_path):
         file_path = file_path.strip('"')
@@ -84,17 +125,22 @@ class EncryptionEngine(CryptoEngine):
     def encrypt_data(self, encrypted_password_cipher: Fernet, file_path_of_file_to_be_encrypted): 
         file_path_of_file_to_be_encrypted = UtilityEngine.process_path(file_path_of_file_to_be_encrypted)
         encrypted_file_name = UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_be_encrypted)
-        encrypted_file_name = f"{encrypted_file_name}.enc"
+        
+        
+        encrypted_file_name = self.encrypt_file_name(encrypted_file_name)
 
-        print(encrypted_file_name)
 
-        with open(file_path_of_file_to_be_encrypted, 'rb') as file:
-            data = file.read() 
+        # print(encrypted_file_name)
+
+        # with open(file_path_of_file_to_be_encrypted, 'rb') as file:
+        #     data = file.read() 
             
-            encrypted_data = encrypted_password_cipher.encrypt(data) 
+        #     encrypted_data = encrypted_password_cipher.encrypt(data) 
 
-            with open(encrypted_file_name, 'wb') as file:
-                file.write(encrypted_data)
+        #     with open(encrypted_file_name, 'wb') as file:
+        #         file.write(encrypted_data)
+
+        return "success"
 
 # MARK: - Decryption Engine 
 
