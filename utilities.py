@@ -47,5 +47,15 @@ class UtilityEngine():
         return compressed_string
     
         
+class StringUtilities():
+    def __init__(self) -> None:
+        pass
 
-
+    @staticmethod
+    def replace_char_at_index(self, string_data: str, index, replacement): 
+        return string_data[:index] + replacement + string_data[index + 1:]
+    
+    @staticmethod
+    def transform_to_utf_8_bytes_string(s: str) -> bytes:
+        return s.encode('utf-8') 
+    
