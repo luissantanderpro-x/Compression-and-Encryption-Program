@@ -3,8 +3,11 @@ from dependencies import unittest
 
 from engines import *
 
-# To test code run following code below 
+"""To run all test cases"""
 # py -m unittest discover -s tests
+
+"""To run Specific Unitest Code Downn below"""
+# py -m unittest discover -k test_encrypt_compressed_file
 
 # MARK: - Unit Test Cases 
 
@@ -51,22 +54,38 @@ class TestCryptoEngines(unittest.TestCase):
     def test_encrypt_password(self): 
         enc_engine = EncryptionEngine() 
 
-        tested_password = "abc"
+        tested_password = "abc123"
 
         tested_password_len = len(tested_password) 
-        encrypted_password_len = len(enc_engine.encrypt_password(tested_password))
+
+        encrypted_password = enc_engine.encrypt_password(tested_password) 
+        encrypted_password_len = len(encrypted_password)
+
+        print(encrypted_password) 
+
 
         self.assertGreater(encrypted_password_len, tested_password_len)
 
     # MARK: - Encrypted File Exists Test 
 
-    # def test_if_encrypted_file_got_created(self): 
-    #     current_working_directory = os.getcwd()
-    #     test_directory = os.path.join(current_working_directory, 'testing', "things.txt")
+    def test_encrypt_compressed_file(self): 
+        """tests if file got encrypted successfully......"""
+        
+        enc_engine = EncryptionEngine() 
 
+        tested_password = "abc123"
+        encrypted_password = enc_engine.encrypt_password(tested_password) 
 
+        print(encrypted_password)
+        
+        compressed_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files_output', 'things.rar')
 
-    #     print(test_directory) 
+        enc_engine.encrypt_file(encrypted_password, compressed_file_path)
+
+        expected_encrypted_file_name = "wklqjvxudu"
+        expected_encrypted_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'encrypted_files', expected_encrypted_file_name)
+
+        self.assertTrue(os.path.exists(expected_encrypted_file_path))   
 
     # MARK: Decrypt File Name Test 
 
@@ -84,9 +103,10 @@ class TestCryptoEngines(unittest.TestCase):
 
     def test_decrypted_password(self): 
         dec_engine = DecryptionEngine() 
+        enc_engine = EncryptionEngine() 
 
-        tested_password = "abc"
-        expected_decrypted_password = "abc" 
+        tested_password = "abc123"
+        expected_decrypted_password = "abc123" 
 
         decrypted_password = dec_engine.decrypt_password(tested_password)
 
@@ -101,8 +121,19 @@ class TestCryptoEngines(unittest.TestCase):
 
         self.assertTrue(is_compressed) 
 
+    # MARK: Check if decrypted file exists test
 
+    def test_if_encrypted_file_got_decrypted_and_staged(self): 
+        dec_engine = DecryptionEngine() 
+        enc_engine = EncryptionEngine() 
 
-        
+        tested_password = "abc123" 
+        tested_password_encrypted = enc_engine.encrypt_password(tested_password) 
 
+        encrypted_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'encrypted_files', 'wklqjvxudu')
 
+        dec_engine.decrypt_file(tested_password_encrypted, encrypted_file_path) 
+
+        decrypted_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'decrypted_files', 'things.rar') 
+
+        self.assertTrue(os.path.exists(decrypted_file_path)) 
