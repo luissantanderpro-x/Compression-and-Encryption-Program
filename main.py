@@ -11,9 +11,8 @@ class FileProcessingProgram():
         pass 
 
     def run_program(self) -> None:
-        CompressionEngineTerminalUIView().init_prompt() 
-        # EncryptionTerminalView().init_prompt() 
-
+        # MainTerminalView.init_prompt() 
+        MainTerminalView().init_prompt() 
 
 # MARK: - Program Main 
 

@@ -12,25 +12,41 @@ class TerminalView():
     def init_prompt(self):
         pass 
 
-    def _prompt_menu_display(self, msg="", bars_size=30): 
+    def _exit(self, exit_msg=""): 
+        print(exit_msg)
+
+    def _prompt_user(self, msg: str, bars_size=30) -> None: 
         UtilityEngine.clear_terminal() 
 
-        menu_options = (
+        prompt_display = (
             "=" * bars_size + "\n" + 
             f"{msg}\n" + 
             "=" * bars_size + "\n" 
         )
 
-        print(menu_options)
+        print(prompt_display)
 
-    def _user_selection(self, msg, functions, *args): 
+    def _get_user_input(self, input_msg: str, type="str"): 
+        user_input = None
+        
+        if (type == 'int'):
+            user_input = int(input(input_msg))
+        else: 
+            user_input = input(input_msg) 
+
+        return user_input
+        
+    def _prompt_selection(self, view_prompt: dict, functions: dict, *args): 
         user_option = -1 
         exit_value = len(functions) 
 
-        while(user_option != exit_value):
-            self._prompt_menu_display(msg) 
-            user_option = int(input("Enter choice: ")) 
+        self._prompt_user(view_prompt.get(1)) 
 
+        while(user_option != exit_value):
+            self._prompt_user(view_prompt.get(1))
+
+            user_option = self._get_user_input(view_prompt.get(2), 'int') 
+            
             if (user_option >= 0 and user_option < exit_value):
                 functions[user_option](*args)
                 user_option = exit_value
@@ -38,7 +54,31 @@ class TerminalView():
                 UtilityEngine.clear_terminal()
                 print("Invalid choice!!! pleae choose again") 
 
-        functions[exit_value]()
+        functions[exit_value](view_prompt.get(3))
+
+
+# MARK: - Terminal View Templates 
+
+terminal_view_templates = {
+    'main': {
+        1: (
+            "Please choose one of the following selections\n"
+            "[1]: Compression\n"
+            "[2]: Encryption\n"
+            "[3]: Decryption" 
+        ), 
+        2: "Enter choice: ",
+        3: 'Exiting main...'
+    }, 
+    'compression_init': {
+        1: (
+            "Welcome to the compression engine please choose one of the following choices\n"
+            "[1]: \n"
+        ),
+        2: "Enter choice: ",
+        3: 'Exiting compression view...'
+    }
+}
 
 
 # MARK: - Compression Engine Terminal UI Prompts
@@ -47,22 +87,18 @@ class CompressionEngineTerminalUIView(TerminalView):
     def __init__(self): 
         self.engine = CompressionEngine()
 
-    def __compress_file(self, file_name, file_path): 
-        msg = (
-            f"compressing file: {file_name}"
-        )
+    # def __compress_file(self, file_name, file_path): 
+    #     msg = (
+    #         f"compressing file: {file_name}"
+    #     )
 
-        self._prompt_menu_display(msg) 
+    #     self._prompt_menu_display(msg) 
 
-        res = self.engine.compress_directory_to_rar(file_path)
+    #     res = self.engine.compress_directory_to_rar(file_path)
 
-        print(res) 
+    #     print(res) 
 
-        input("Press enter to return to main menu") 
-
-
-    def __exit(self): 
-        print("exiting compression program") 
+    #     input("Press enter to return to main menu") 
 
     def __compression_prompt(self): 
         msg = "Please Enter a file path or drag file \n"
@@ -93,45 +129,9 @@ class CompressionEngineTerminalUIView(TerminalView):
             print("file does not exist") 
             input("Press Enter to return to main menu: ")
 
-
-
     def init_prompt(self): 
-        msg = (
-            "[1]: Compress Directory to RAR\n"
-            "[2]: Exit"
-        )
+        pass 
 
-        functions = {
-            1: self.__compression_prompt,
-            2: self.__exit
-        }
-
-        self._user_selection(msg, functions) 
-
-
-# MARK: - Encryption Terminal UI Prompts 
-
-class EncryptionTerminalView(TerminalView): 
-    def __init__(self): 
-        self.engine = EncryptionEngine()
-
-    # def exit(self): 
-    #     print("Exiting Encryption Terminal View") 
-
-    # def init_prompt(self):
-    #     print("Encryption Terminal Init Prompot") 
-
-    #     msg = (
-    #         "[1]: Encrypt Directory"
-    #         "[2]: Exit"
-    #     )
-
-    #     functions = {
-    #         1: self.engine.encrypt_data,
-    #         2: self.exit
-    #     }
-
-    #     self._user_selection(msg, functions) 
 
 # MARK: - Main Terminal View
 
@@ -139,11 +139,24 @@ class MainTerminalView(TerminalView):
     def __init__(self):
         pass 
 
-    def init_prompt(self):
-        pass
-        # user_option = -1 
+    def __get_compression_view(self):
+        print("compression view...") 
 
-        # msg = (
-        #     "[1]: Compression\n"
-        #     "[4]: Exit\n"
-        # )
+    def __get_encryption_view(self):
+        print("encryption view....")
+
+    def __get_decryption_view(self): 
+        print("decryption view....")  
+
+    def __load_functions(self) -> dict: 
+        return {
+            1: self.__get_compression_view,
+            2: self.__get_encryption_view,
+            3: self.__get_decryption_view, 
+            4: self._exit
+        }
+
+    def init_prompt(self):
+        view_prompt = terminal_view_templates['main']
+        self._prompt_selection(view_prompt, self.__load_functions())
+

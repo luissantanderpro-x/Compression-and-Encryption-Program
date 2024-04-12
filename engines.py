@@ -199,8 +199,7 @@ class DecryptionEngine(CryptoEngine):
         decrypted_file_name = self.ceasars_cipher_decrypt(file_name) 
 
         return decrypted_file_name
-    
-    
+
     def decrypt_file(self, password: bytes, encrypted_file_path):
         """Decrypts file and outputs it to decrypted_files directory"""
 
