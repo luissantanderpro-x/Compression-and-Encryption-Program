@@ -62,6 +62,9 @@ class StringUtilities():
 
     @staticmethod
     def replace_char_at_index(string_data: str, index, replacement): 
+        if index < 0 or index >= len(string_data):
+            raise IndexError("Index out of range.")
+
         return string_data[:index] + replacement + string_data[index + 1:]
     
     @staticmethod

@@ -1,7 +1,10 @@
 # MARK: - Dependencies and Imports 
 from utilities import UtilityEngine
+from utilities import StringUtilities
 from engines import CompressionEngine
 from engines import EncryptionEngine
+
+from dependencies import keyboard
 
 # MARK: - Terminal View
 
@@ -15,8 +18,10 @@ class TerminalView():
     def _exit(self, exit_msg=""): 
         print(exit_msg)
 
-    def _prompt_user(self, msg: str, bars_size=30) -> None: 
+    def _prompt_user(self, msg: list, bars_size=30) -> None: 
         UtilityEngine.clear_terminal() 
+
+        msg = "".join(msg) 
 
         prompt_display = (
             "=" * bars_size + "\n" + 
@@ -35,46 +40,90 @@ class TerminalView():
             user_input = input(input_msg) 
 
         return user_input
+    
+    def on_arrow_key(self, event, currently_selected_option, prompt, limit=4):
+
+        if (event.event_type == keyboard.KEY_DOWN):
+            if event.name == 'up':
+                print("Up arrow pressed")
+                if (currently_selected_option[0] != 0):
+                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, " ") 
+
+                    currently_selected_option[0] -= 1
+
+                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, "*") 
         
+            elif (event.name == 'down'):
+                print("Down arrow pressed")
+
+                if (currently_selected_option[0] != limit):
+                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, " ") 
+
+                    currently_selected_option[0] += 1
+
+                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, "*") 
+
+            self._prompt_user(prompt)
+                    
+
     def _prompt_selection(self, view_prompt: dict, functions: dict, *args): 
-        user_option = -1 
-        exit_value = len(functions) 
+        selected_user_option = [0]
 
-        self._prompt_user(view_prompt.get(1)) 
+        exit_value = len(functions) - 1
 
-        while(user_option != exit_value):
-            self._prompt_user(view_prompt.get(1))
+        prompt = view_prompt.get(1)[:]
 
-            user_option = self._get_user_input(view_prompt.get(2), 'int') 
+        keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, selected_user_option, prompt, exit_value)) 
+        keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, selected_user_option, prompt, exit_value))
+
+        currently_selected = selected_user_option[0]
+
+        self._prompt_user(prompt) 
+
+        while (currently_selected != exit_value): 
+            keyboard.wait('return') 
+
+            # TODO: Write code here for triggering functions 
+
+            currently_selected = selected_user_option[0]
+
+            functions[currently_selected]()
+
+
+        print(selected_user_option)
+
+        # while(user_option != exit_value):
+        #     self._prompt_user(view_prompt.get(1))
+
+        #     user_option = self._get_user_input(view_prompt.get(2), 'int') 
             
-            if (user_option >= 0 and user_option < exit_value):
-                functions[user_option](*args)
-                user_option = exit_value
-            elif (user_option != exit_value):
-                UtilityEngine.clear_terminal()
-                print("Invalid choice!!! pleae choose again") 
+        #     if (user_option >= 0 and user_option < exit_value):
+        #         functions[user_option](*args)
+        #         user_option = exit_value
+        #     elif (user_option != exit_value):
+        #         UtilityEngine.clear_terminal()
+        #         print("Invalid choice!!! pleae choose again") 
 
-        functions[exit_value](view_prompt.get(3))
+        # functions[exit_value](view_prompt.get(3))
 
 
 # MARK: - Terminal View Templates 
 
 terminal_view_templates = {
     'main': {
-        1: (
-            "Please choose one of the following selections\n"
-            "[1]: Compression\n"
-            "[2]: Encryption\n"
-            "[3]: Decryption" 
-        ), 
+        1: [
+            "[*] Compression\n",
+            "[ ] Encryption\n",
+            "[ ] Decryption\n",
+            "[ ] Exit"
+        ], 
         2: "Enter choice: ",
         3: 'Exiting main...'
     }, 
     'compression_init': {
-        1: (
-            "Welcome to the compression engine please choose one of the following choices\n"
-            "[1]: \n"
-        ),
+        1: ["Welcome to compression program...\n"
+            
+        ],
         2: "Enter choice: ",
         3: 'Exiting compression view...'
     }
@@ -132,7 +181,6 @@ class CompressionEngineTerminalUIView(TerminalView):
     def init_prompt(self): 
         pass 
 
-
 # MARK: - Main Terminal View
 
 class MainTerminalView(TerminalView):
@@ -150,10 +198,10 @@ class MainTerminalView(TerminalView):
 
     def __load_functions(self) -> dict: 
         return {
-            1: self.__get_compression_view,
-            2: self.__get_encryption_view,
-            3: self.__get_decryption_view, 
-            4: self._exit
+            0: self.__get_compression_view,
+            1: self.__get_encryption_view,
+            2: self.__get_decryption_view, 
+            3: lambda: self._exit("Exiting main terminal view")
         }
 
     def init_prompt(self):
