@@ -11,8 +11,8 @@ class FileProcessingProgram():
         pass 
 
     def run_program(self) -> None:
-        # MainTerminalView.init_prompt() 
         MainTerminalView().init_prompt() 
+        print("Exiting program.........") 
 
 # MARK: - Program Main 
 

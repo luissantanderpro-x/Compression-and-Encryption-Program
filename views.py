@@ -6,6 +6,35 @@ from engines import EncryptionEngine
 
 from dependencies import keyboard
 
+
+def capture_input():
+    input_string = ""
+    print("Enter your input (press Enter to submit):")
+    
+    # Listen for key presses
+    while True:
+        event = keyboard.read_event(suppress=True)
+        
+        if event.event_type == keyboard.KEY_DOWN:
+            if event.name == 'enter':
+                # Terminate input loop when Enter is pressed
+                break
+            elif event.name == 'backspace':
+                # Remove the last character from the input_string
+                input_string = input_string[:-1]
+            elif len(event.name) == 1:
+                # Append the pressed character to the input_string
+                input_string += event.name
+
+        print(input_string) 
+    
+    keyboard.unhook_all() 
+    
+    return input_string
+
+
+
+
 # MARK: - Terminal View
 
 class TerminalView():
@@ -17,6 +46,7 @@ class TerminalView():
 
     def _exit(self, exit_msg=""): 
         print(exit_msg)
+        return 
 
     def _prompt_user(self, msg: list, bars_size=30) -> None: 
         UtilityEngine.clear_terminal() 
@@ -41,94 +71,83 @@ class TerminalView():
 
         return user_input
     
-    def on_arrow_key(self, event, currently_selected_option, prompt, limit=4):
-
+    def on_arrow_key(self, event, header_template_array_list, currently_selected_option, menu_options_template, limit=4):
         if (event.event_type == keyboard.KEY_DOWN):
             if event.name == 'up':
-                print("Up arrow pressed")
                 if (currently_selected_option[0] != 0):
-                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, " ") 
+                    menu_options_template[currently_selected_option[0]] = StringUtilities.replace_char_at_index(menu_options_template[currently_selected_option[0]], 1, " ") 
 
                     currently_selected_option[0] -= 1
 
-                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, "*") 
+                    menu_options_template[currently_selected_option[0]] = StringUtilities.replace_char_at_index(menu_options_template[currently_selected_option[0]], 1, "X") 
         
             elif (event.name == 'down'):
-                print("Down arrow pressed")
-
                 if (currently_selected_option[0] != limit):
-                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, " ") 
+                    menu_options_template[currently_selected_option[0]] = StringUtilities.replace_char_at_index(menu_options_template[currently_selected_option[0]], 1, " ") 
 
                     currently_selected_option[0] += 1
 
-                    prompt[currently_selected_option[0]] = StringUtilities.replace_char_at_index(prompt[currently_selected_option[0]], 1, "*") 
+                    menu_options_template[currently_selected_option[0]] = StringUtilities.replace_char_at_index(menu_options_template[currently_selected_option[0]], 1, "X") 
+            
+            prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_options_template) 
 
-            self._prompt_user(prompt)
+            self._prompt_user(prompt_msg, 40)
+
+    # TODO: Place in String Utilities when Refactoring
+
+    def merge_multiplpe_string_arrays_into_msg(self, *args) -> str: 
+        msg = ""
+        for template in args: 
+            template_msg = "".join(template) 
+            msg += template_msg
+
+        return msg
                     
-
-    def _prompt_selection(self, view_prompt: dict, functions: dict, *args): 
+    def _prompt_selection(self, menu_choices: dict, functions: dict, *args): 
         selected_user_option = [0]
 
         exit_value = len(functions) - 1
 
-        prompt = view_prompt.get(1)[:]
-
-        keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, selected_user_option, prompt, exit_value)) 
-        keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, selected_user_option, prompt, exit_value))
+        header_template_array_list = menu_choices.get('header')[:]
+        menu_choices_template_list = menu_choices.get('menu_choices')[:]
 
         currently_selected = selected_user_option[0]
 
-        self._prompt_user(prompt) 
+        prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list)
 
-        while (currently_selected != exit_value): 
-            keyboard.wait('return') 
-
-            # TODO: Write code here for triggering functions 
-
+        while (currently_selected != exit_value):
+            self._prompt_user(prompt_msg, 40)
+            keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, exit_value)) 
+            keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, exit_value))
+            keyboard.wait('esc') 
+            keyboard.unhook_all() 
             currently_selected = selected_user_option[0]
-
             functions[currently_selected]()
-
-
-        print(selected_user_option)
-
-        # while(user_option != exit_value):
-        #     self._prompt_user(view_prompt.get(1))
-
-        #     user_option = self._get_user_input(view_prompt.get(2), 'int') 
-            
-        #     if (user_option >= 0 and user_option < exit_value):
-        #         functions[user_option](*args)
-        #         user_option = exit_value
-        #     elif (user_option != exit_value):
-        #         UtilityEngine.clear_terminal()
-        #         print("Invalid choice!!! pleae choose again") 
-
-        # functions[exit_value](view_prompt.get(3))
-
 
 # MARK: - Terminal View Templates 
 
 terminal_view_templates = {
     'main': {
-        1: [
-            "[*] Compression\n",
+        'header': [
+            "Please enter one of the following options\n"
+        ], 
+        'menu_choices': [
+            "[X] Compression\n",
             "[ ] Encryption\n",
             "[ ] Decryption\n",
             "[ ] Exit"
-        ], 
-        2: "Enter choice: ",
-        3: 'Exiting main...'
+        ]
     }, 
-    'compression_init': {
-        1: ["Welcome to compression program...\n"
-            
+    'compression_main': {
+        'header': [
+            "Welcome to the compression engine...\n Please choose one of the following compression options\n"
         ],
-        2: "Enter choice: ",
-        3: 'Exiting compression view...'
+        'menu_choices': [
+            "[X] Compress to RAR Format\n",
+            "[ ] Return back to Main Menu"
+        ]
     }
 }
-
 
 # MARK: - Compression Engine Terminal UI Prompts
 
@@ -149,37 +168,51 @@ class CompressionEngineTerminalUIView(TerminalView):
 
     #     input("Press enter to return to main menu") 
 
+    # def __compression_prompt(self): 
+    #     msg = "Please Enter a file path or drag file \n"
+    #     self._prompt_menu_display(msg) 
+    #     file_path = input("File Path: ")
+
+    #     file_path = self.engine.load_file(file_path) 
+
+
+    #     if (UtilityEngine.check_if_path_exists(file_path)): 
+    #         file_name = UtilityEngine.get_file_name_out_of_path(file_path)
+
+    #         msg = (
+    #             f"Would you like to proceed in compressing the file: {file_name}\n" 
+    #             "[1]: Yes\n"
+    #             "[2]: No\n"
+    #         )
+
+    #         functions = {
+    #             1: self.__compress_file,
+    #             2: self.__exit
+    #         }
+
+    #         self._user_selection(msg, functions, file_name, file_path)
+
+
+    #     else:
+    #         print("file does not exist") 
+    #         input("Press Enter to return to main menu: ")
+
     def __compression_prompt(self): 
-        msg = "Please Enter a file path or drag file \n"
-        self._prompt_menu_display(msg) 
-        file_path = input("File Path: ")
+        print('compressoin prompot') 
+        
+        user_input = input("enter something......") 
 
-        file_path = self.engine.load_file(file_path) 
+        print(user_input)
 
-
-        if (UtilityEngine.check_if_path_exists(file_path)): 
-            file_name = UtilityEngine.get_file_name_out_of_path(file_path)
-
-            msg = (
-                f"Would you like to proceed in compressing the file: {file_name}\n" 
-                "[1]: Yes\n"
-                "[2]: No\n"
-            )
-
-            functions = {
-                1: self.__compress_file,
-                2: self.__exit
-            }
-
-            self._user_selection(msg, functions, file_name, file_path)
-
-
-        else:
-            print("file does not exist") 
-            input("Press Enter to return to main menu: ")
+    def __load_functions(self) -> dict: 
+        return {
+            0: self.__compression_prompt,
+            1: lambda: self._exit("Exiting main compression menu...") 
+        }
 
     def init_prompt(self): 
-        pass 
+        main_view_template = terminal_view_templates['compression_main']
+        self._prompt_selection(main_view_template, self.__load_functions())
 
 # MARK: - Main Terminal View
 
@@ -189,6 +222,7 @@ class MainTerminalView(TerminalView):
 
     def __get_compression_view(self):
         print("compression view...") 
+        CompressionEngineTerminalUIView().init_prompt() 
 
     def __get_encryption_view(self):
         print("encryption view....")
@@ -207,4 +241,5 @@ class MainTerminalView(TerminalView):
     def init_prompt(self):
         view_prompt = terminal_view_templates['main']
         self._prompt_selection(view_prompt, self.__load_functions())
+
 
