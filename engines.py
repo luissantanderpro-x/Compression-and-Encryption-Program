@@ -54,11 +54,15 @@ class CryptoEngine():
         decrypted_text = self.ceasars_cipher_encrypt(string_data, shift * -1)
         return decrypted_text
     
+    
 # MARK: - Compression Engine
 
 class CompressionEngine(CryptoEngine): 
     def __init__(self): 
         pass 
+
+    def get_current_working_directory(self) -> str: 
+        return os.getcwd() 
 
     def create_compressed_files_directory(self, directory_path):
         compressed_file_directory = os.path.join(directory_path, 'compressed_files_output')
