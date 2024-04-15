@@ -206,6 +206,8 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         file_path = input('file path: ') 
 
+        print(f"[1] file path: {file_path}")
+
         functions = {
             0: lambda: self._proceed(self.__compress_file_to_rar, file_path), 
             1: lambda: self._exit('going back to previous menu...') 
