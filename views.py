@@ -17,7 +17,7 @@ terminal_view_templates = {
             "[X] Compression\n",
             "[ ] Encryption\n",
             "[ ] Decryption\n",
-            "[ ] Exit\n"
+            "[ ] Exit Program\n"
         ],
         'footer': [
             "\npress [ enter ] to proceed with selected option.\n" 
@@ -25,11 +25,11 @@ terminal_view_templates = {
     }, 
     'compression_main': {
         'header': [
-            "Welcome to the compression engine...\n"
+            "Welcome to the compression engine...\nChoose a following compression scheme\n"
         ],
         'menu_choices': [
-            "[X] Compress to RAR Format\n",
-            "[ ] Return back to Main Menu\n"
+            "[X] RAR\n",
+            "[ ] Return to main menu\n"
         ],
         "footer": [
             "\npress [ enter ] to proceed with selected option.\n" 
@@ -37,14 +37,38 @@ terminal_view_templates = {
     },
     'compression_yes_or_no_options': {
         'header': [
-            "Do you want to compress the file\n"
+            "Do you wish to compress the file\n"
         ],
         'menu_choices': [
-            "[X] Yes\n",
-            "[ ] No\n"
+            '[X] Yes\n',
+            '[ ] No\n'
         ],
-        "footer": [
-            ""
+        'footer': [
+            ''
+        ]
+    },
+    'encryption_main': {
+        'header': [
+            'Welcome to the encryption engine...\nChoose one of the following encryption schemes\n'
+        ],
+        'menu_choices': [
+            '[X] SHA256\n',
+            '[ ] Return to main menu\n'
+        ], 
+        'footer': [
+            '\npress [ enter ] to proceed with selected option.\n'
+        ]
+    }, 
+    'encryption_yes_or_no_options': {
+        'header': [
+            'Do you wish to encrypt the file\n'
+        ],
+        'menu_choices': [
+            '[X] Yes\n',
+            '[ ] No\n'
+        ],
+        'footer': [
+            ''
         ]
     }
 }
@@ -57,6 +81,9 @@ class TerminalView():
 
     def init_prompt(self):
         pass 
+
+    def _proceed(self, callback, *args):
+        return callback(*args) 
 
     def _exit(self, exit_msg=""): 
         print(exit_msg)
@@ -140,12 +167,16 @@ class TerminalView():
             input() 
 
             keyboard.unhook_all() 
+
             currently_selected = selected_user_option[0]
 
             res = functions[currently_selected]()
 
-            if (res == exit_value):
+            if (res == exit_value or res == exit_value):
                 currently_selected = exit_value
+            else:
+                # Reset back to initial state
+                selected_user_option = [0]
 
 
 # MARK: - Compression Engine Terminal UI Prompts
@@ -154,15 +185,14 @@ class CompressionEngineTerminalUIView(TerminalView):
     def __init__(self): 
         self.engine = CompressionEngine()
 
-    def _proceed(self, callback, *args):
-        return callback(*args) 
-
     def __compress_file_to_rar(self, file_path) -> int: 
         print(f"compressing file {file_path}")
 
         current_working_directory = self.engine.get_current_working_directory() 
 
         self.engine.create_compressed_files_directory(current_working_directory)
+
+        file_path = UtilityEngine.process_path(file_path) 
 
         result = self.engine.compress_directory_to_rar(file_path)
 
@@ -174,11 +204,11 @@ class CompressionEngineTerminalUIView(TerminalView):
     def __compress_file_to_rar_prompt(self): 
         print("Enter file path of file or directory you with to compress")
 
-        file_path = input("file path: ") 
+        file_path = input('file path: ') 
 
         functions = {
             0: lambda: self._proceed(self.__compress_file_to_rar, file_path), 
-            1: lambda: self._exit("going back to previous menu...") 
+            1: lambda: self._exit('going back to previous menu...') 
         }
 
         compression_template = terminal_view_templates['compression_yes_or_no_options']
@@ -194,6 +224,55 @@ class CompressionEngineTerminalUIView(TerminalView):
         main_view_template = terminal_view_templates['compression_main']
         self._prompt_selection(main_view_template, self.__load_functions())
 
+# MARK: - Encryption Engine Terminal UI Prompts 
+
+class EncryptionEngineTerminalUIView(TerminalView):
+    def __init__(self) -> None:
+        self.encryption_engine = EncryptionEngine() 
+
+    def __encrypt_file(self, file_path: str): 
+        '''Engine logic goes here'''
+        pass
+
+    def __encrypt_file_prompt(self): 
+        print("Enter a file path to compressed file you want to encrypt\n") 
+
+        file_path = input('compressed file path: ') 
+
+        UtilityEngine.clear_terminal()
+
+        hashed_password_one = b'1'
+        hashed_password_two = b'2' 
+
+        while (hashed_password_one != hashed_password_two):
+            hashed_password_one = self.encryption_engine.encrypt_password(input("Enter password to encrypt file with: "))
+            hashed_password_two = self.encryption_engine.encrypt_password(input("Enter password to encrypt file one more time to double check: "))
+
+            if (hashed_password_one != hashed_password_two):
+                print("passwords don't match enter again")
+            
+
+        functions = {
+            0: lambda: self._proceed(self.__encrypt_file, file_path), 
+            1: lambda: self._exit('going back to previous menu...')    
+        }
+
+        print(f'result: {file_path}')
+        input('press enter to proceed forward\n')
+
+        return 1
+
+    def __load_functions(self) -> dict: 
+        return {
+            0: self.__encrypt_file_prompt,
+            1: lambda: self._exit('exiting encryption engine') 
+        }
+
+    def init_prompt(self):
+        encryption_main_view_template = terminal_view_templates['encryption_main']
+        self._prompt_selection(encryption_main_view_template, self.__load_functions())
+
+
 # MARK: - Main Terminal View
 
 class MainTerminalView(TerminalView):
@@ -206,6 +285,7 @@ class MainTerminalView(TerminalView):
 
     def __get_encryption_view(self):
         print("encryption view....")
+        EncryptionEngineTerminalUIView().init_prompt()
 
     def __get_decryption_view(self): 
         print("decryption view....")  
@@ -215,11 +295,12 @@ class MainTerminalView(TerminalView):
             0: self.__get_compression_view,
             1: self.__get_encryption_view,
             2: self.__get_decryption_view, 
-            3: lambda: self._exit("Exiting main terminal view")
+            3: lambda: self._exit('Exiting main terminal view')
         }
 
     def init_prompt(self):
         view_prompt = terminal_view_templates['main']
         self._prompt_selection(view_prompt, self.__load_functions())
+
 
 

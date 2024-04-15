@@ -33,8 +33,10 @@ class UtilityEngine():
         os.system(CLEAR_COMMAND)
 
     @staticmethod
-    def process_path(file_path): 
+    def process_path(file_path: str) -> str:  
         file_path = file_path.strip('"')
+        file_path = file_path.strip('& ')
+        file_path = file_path.strip("'")
         return file_path
     
     @staticmethod
@@ -49,10 +51,16 @@ class UtilityEngine():
 
 # MARK: - File Path Processing Utilities 
 
-class FileProcessingUtilities():
+class FilePathProcessingUtilities():
     def __init__(self) -> None:
         pass
 
+    @staticmethod
+    def process_path(file_path: str) -> str:
+        file_path = file_path.strip('"')
+        file_path = file_path.strip('& ')
+        file_path = file_path.strip("'")
+        return file_path
 
 # MARK: - String Utilities 
         

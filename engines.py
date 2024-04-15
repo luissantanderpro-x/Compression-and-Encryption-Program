@@ -3,7 +3,6 @@ from dependencies import os
 from dependencies import base64
 from dependencies import subprocess
 
-
 from utilities import UtilityEngine
 from utilities import StringUtilities
 
@@ -19,7 +18,6 @@ class CryptoEngine():
         self.salt = b'salt_value'
     
     def crypto_hashing_processor(self, password_bytes, data_bytes):
-
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(), 
             length=32,
@@ -65,7 +63,7 @@ class CompressionEngine(CryptoEngine):
         return os.getcwd() 
 
     def create_compressed_files_directory(self, directory_path):
-        compressed_file_directory = os.path.join(directory_path, 'compressed_files_output')
+        compressed_file_directory = os.path.join(directory_path, 'compressed_files')
 
         try: 
             os.mkdir(compressed_file_directory)
@@ -120,8 +118,6 @@ class EncryptionEngine(CryptoEngine):
         salt_value = b'salt-123'
 
         password_bytes = UtilityEngine.transform_to_utf_8_bytes_string(password) 
-
-        data_bytes = b"xxx"
 
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(), 
