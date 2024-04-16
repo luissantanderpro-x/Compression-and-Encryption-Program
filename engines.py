@@ -27,9 +27,6 @@ class CryptoEngine():
         )
 
         key = kdf.derive(password_bytes)
-
-        print(key)
-
         cipher = Fernet(base64.urlsafe_b64encode(key))
 
         return cipher.encrypt(data_bytes) 
@@ -51,7 +48,6 @@ class CryptoEngine():
     def ceasars_cipher_decrypt(self, string_data, shift=3): 
         decrypted_text = self.ceasars_cipher_encrypt(string_data, shift * -1)
         return decrypted_text
-    
     
 # MARK: - Compression Engine
 
@@ -185,11 +181,7 @@ class DecryptionEngine(CryptoEngine):
         return decrypted_file_directory
     
     def decrypt_data(self, password: bytes, data: bytes): 
-
-        print(password)
-
-        input(":")
-
+        '''data decryption happens here...'''
         cipher = Fernet(password) 
         return cipher.decrypt(data)
 
