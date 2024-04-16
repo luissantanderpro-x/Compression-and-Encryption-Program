@@ -3,6 +3,6 @@ secret.txt
 
 # Ignore Specfic Directories 
 /testing/
-/compressed_files_output/
+/compressed_files/
 /encrypted_files/
 /decrypted_files/
