@@ -256,6 +256,8 @@ class DecryptionEngineTerminalUIView(TerminalView):
 
         UtilityEngine.clear_terminal()
 
+        encrypted_file_path = FilePathProcessingUtilities.process_path(encrypted_file_path) 
+
         if (FilePathProcessingUtilities.check_if_file_path_exists(encrypted_file_path)):
             hashed_password = self.__get_password_from_user() 
             self.__decrypt_the_file(hashed_password, encrypted_file_path)
