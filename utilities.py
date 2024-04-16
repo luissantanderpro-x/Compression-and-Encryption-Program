@@ -61,6 +61,14 @@ class FilePathProcessingUtilities():
         file_path = file_path.strip('& ')
         file_path = file_path.strip("'")
         return file_path
+    
+    @staticmethod
+    def check_if_file_path_exists(file_path: str) -> bool:
+       return os.path.exists(file_path)
+    
+    @staticmethod
+    def get_file_name_out_of_path(file_path: str) -> str:
+        return os.path.basename(file_path) 
 
 # MARK: - String Utilities 
         
@@ -69,10 +77,7 @@ class StringUtilities():
         pass
 
     @staticmethod
-    def replace_char_at_index(string_data: str, index, replacement): 
-        if index < 0 or index >= len(string_data):
-            raise IndexError("Index out of range.")
-
+    def replace_char_at_index(string_data: str, index: int, replacement: str): 
         return string_data[:index] + replacement + string_data[index + 1:]
     
     @staticmethod

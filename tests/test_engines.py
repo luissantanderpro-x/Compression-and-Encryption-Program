@@ -45,9 +45,21 @@ class TestCryptoEngines(unittest.TestCase):
         test_file_name = 'tested_file.rar'
         expected_encrypted_file_name = "whvwhg_ilohxudu"
 
-        encrypted_file_name = enc_engine.encrypt_file_name(test_file_name)
+        result = enc_engine.encrypt_file_name(test_file_name)
 
-        self.assertEqual(expected_encrypted_file_name, encrypted_file_name) 
+        params = (
+            'Inputs\n'
+            '==============================\n'
+            f'File Name: {test_file_name}\n'
+            'Result\n'
+            '==============================\n'
+            f'Expected file name: {expected_encrypted_file_name}\n'
+            f'Result: {result}\n'
+        )
+
+        print(params)
+
+        self.assertEqual(expected_encrypted_file_name, result) 
 
     # MARK: - Encrypt Password Test
 
@@ -67,18 +79,17 @@ class TestCryptoEngines(unittest.TestCase):
         self.assertGreater(encrypted_password_len, tested_password_len)
 
     # MARK: - Encrypted File Exists Test 
-
+# py -m unittest discover -k test_encrypt_compressed_file
     def test_encrypt_compressed_file(self): 
         """tests if file got encrypted successfully......"""
         
         enc_engine = EncryptionEngine() 
 
-        tested_password = "abc123"
+        tested_password = 'abc'
         encrypted_password = enc_engine.encrypt_password(tested_password) 
 
-        print(encrypted_password)
         
-        compressed_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files_output', 'things.rar')
+        compressed_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files', 'things.rar')
 
         enc_engine.encrypt_file(encrypted_password, compressed_file_path)
 

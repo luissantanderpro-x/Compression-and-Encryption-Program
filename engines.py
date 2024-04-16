@@ -141,7 +141,7 @@ class EncryptionEngine(CryptoEngine):
 
         return encrypted_file_name
     
-    def encrypt_file(self, password: bytes, compressed_file_path): 
+    def encrypt_file(self, password: bytes, compressed_file_path: str): 
         """Encrypts file and outputs it to specific encrypted directory"""
 
         encrypted_directory_path = self.create_encrypted_files_directory() 
@@ -165,21 +165,31 @@ class EncryptionEngine(CryptoEngine):
 
 class DecryptionEngine(CryptoEngine):
     def __init__(self): 
-        pass 
+        self.__decrypted_file_directory = '' 
+
+    def get_decrypted_file_directory(self) -> str: 
+        return self.__decrypted_file_directory
 
     def create_decrypted_files_directory(self):
-        encrypted_file_directory = os.path.join(os.getcwd(), 'decrypted_files')
+        decrypted_file_directory = os.path.join(os.getcwd(), 'decrypted_files')
 
         try: 
-            os.mkdir(encrypted_file_directory)
+            os.mkdir(decrypted_file_directory)
         except FileExistsError:
             print("Directory decrypted_files already exists")
         except Exception as e:
             print("Uknown error occurred.....") 
 
-        return encrypted_file_directory
+        self.__decrypted_file_directory = decrypted_file_directory
+
+        return decrypted_file_directory
     
     def decrypt_data(self, password: bytes, data: bytes): 
+
+        print(password)
+
+        input(":")
+
         cipher = Fernet(password) 
         return cipher.decrypt(data)
 
@@ -200,7 +210,7 @@ class DecryptionEngine(CryptoEngine):
 
         return decrypted_file_name
 
-    def decrypt_file(self, password: bytes, encrypted_file_path):
+    def decrypt_file(self, password: bytes, encrypted_file_path: str) -> None:
         """Decrypts file and outputs it to decrypted_files directory"""
 
         decrypted_directory_path = self.create_decrypted_files_directory()
@@ -210,8 +220,6 @@ class DecryptionEngine(CryptoEngine):
         encrypted_file_name = UtilityEngine.get_file_name_out_of_path(encrypted_file_path)
 
         decrypted_file_name = self.decrypt_file_name(encrypted_file_name) 
-
-        print(decrypted_file_name)
 
         with open(encrypted_file_path, 'rb') as encrypted_file: 
             data = encrypted_file.read()
