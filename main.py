@@ -1,8 +1,4 @@
-# MARK: - Imports 
-
-# TODO: Change this imports to specfiic imports
-
-from views import *
+from views import MainTerminalView
 
 # MARK: - File Processing Program: 
 

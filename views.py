@@ -8,6 +8,7 @@ from engines import EncryptionEngine
 from engines import DecryptionEngine
 
 from dependencies import keyboard
+from dependencies import time 
 
 from terminal_view_templates import templates
 
@@ -23,11 +24,11 @@ class TerminalView():
     def _proceed(self, callback, *args):
         return callback(*args) 
 
-    def _exit(self, exit_msg=""): 
+    def _exit(self, exit_value: int, exit_msg=""): 
         print(exit_msg)
-        return 
+        return exit_value
 
-    def _prompt_user(self, msg: list, bars_size=30) -> str: 
+    def _prompt_user(self, msg: list, bars_size=50) -> str: 
         UtilityEngine.clear_terminal() 
 
         msg = "".join(msg) 
@@ -51,7 +52,7 @@ class TerminalView():
 
         return user_input
     
-    def on_arrow_key(self, event, header_template_array_list, currently_selected_option, menu_options_template, footer_template, limit=4):
+    def on_arrow_key(self, event, header_template_array_list, currently_selected_option: list, menu_options_template, footer_template, limit=4):
         if (event.event_type == keyboard.KEY_DOWN):
             if event.name == 'up':
                 if (currently_selected_option[0] != 0):
@@ -71,7 +72,8 @@ class TerminalView():
             
             prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_options_template, footer_template) 
 
-            self._prompt_user(prompt_msg, 40)
+            '''Refreshes the screen everytime user moves the cursor'''
+            self._prompt_user(prompt_msg, 50)
 
     # TODO: Place in String Utilities when Refactoring
 
@@ -97,7 +99,7 @@ class TerminalView():
 
             prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
 
-            self._prompt_user(prompt_msg, 40)
+            self._prompt_user(prompt_msg, 50)
             keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value)) 
             keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value))  
 
@@ -109,7 +111,9 @@ class TerminalView():
 
             res = functions[currently_selected]()
 
-            if (currently_selected != exit_value): 
+            if (res == exit_value):
+                currently_selected = res
+            elif (currently_selected != exit_value): 
                 selected_user_option = [0]
                 currently_selected = selected_user_option[0]
 
@@ -144,7 +148,7 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         functions = {
             0: lambda: self._proceed(self.__compress_file_to_rar, file_path), 
-            1: lambda: self._exit('going back to previous menu...') 
+            1: lambda: self._exit(1, 'going back to previous menu...') 
         }
 
         compression_template = templates['compression_yes_or_no_options']
@@ -153,7 +157,7 @@ class CompressionEngineTerminalUIView(TerminalView):
     def __load_functions(self) -> dict: 
         return {
             0: self.__compress_file_to_rar_prompt, 
-            1: lambda: self._exit("exiting compression engine....")
+            1: lambda: self._exit(1, "exiting compression engine....")
         }
 
     def init_prompt(self): 
@@ -197,7 +201,7 @@ class EncryptionEngineTerminalUIView(TerminalView):
             
         functions = {
             0: lambda: self._proceed(self.__encrypt_file, file_path, hashed_password_one), 
-            1: lambda: self._exit('going back to previous menu...')    
+            1: lambda: self._exit(1, 'going back to previous menu...')    
         }
 
         self._prompt_selection(templates['encryption_yes_or_no_options'], functions) 
@@ -207,7 +211,7 @@ class EncryptionEngineTerminalUIView(TerminalView):
     def __load_functions(self) -> dict: 
         return {
             0: self.__encrypt_file_prompt,
-            1: lambda: self._exit('exiting encryption engine') 
+            1: lambda: self._exit(1, 'exiting encryption engine') 
         }
 
     def init_prompt(self):
@@ -223,14 +227,8 @@ class DecryptionEngineTerminalUIView(TerminalView):
 
     def __get_password_from_user(self) -> str: 
         UtilityEngine.clear_terminal()
-        password = input('Please enter file password in order to decrypt: ') 
-
+        password = input('Please enter password in order to decrypt file: ') 
         hashed_password = self.enc_engine.encrypt_password(password)
-
-        print(f'hashed password: {hashed_password}')
-
-        input(':') 
-
         return hashed_password
 
     def __decrypt_the_file(self, hashed_password: bytes, encrypted_file_path: str) -> int:
@@ -269,7 +267,7 @@ class DecryptionEngineTerminalUIView(TerminalView):
     def __load_functions(self) -> dict:
         return {
             0: self.__decryption_file_prompt,
-            1: lambda: self._exit('exiting decryption engine') 
+            1: lambda: self._exit(1, 'exiting decryption engine') 
         }
 
     def init_prompt(self):
@@ -296,11 +294,19 @@ class MainTerminalView(TerminalView):
             0: self.__get_compression_view,
             1: self.__get_encryption_view,
             2: self.__get_decryption_view, 
-            3: lambda: self._exit('Exiting main terminal view')
+            3: lambda: self._exit(3, 'Exiting main terminal view')
         }
 
     def init_prompt(self):
         view_prompt = templates['main']
+        intro_template = templates['intro'].get('banner') 
+
+        banner = self.merge_multiplpe_string_arrays_into_msg(intro_template)
+
+        self._prompt_user(banner) 
+
+        time.sleep(2)
+
         self._prompt_selection(view_prompt, self.__load_functions())
 
 

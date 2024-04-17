@@ -138,7 +138,7 @@ class EncryptionEngine(CryptoEngine):
         return encrypted_file_name
     
     def encrypt_file(self, password: bytes, compressed_file_path: str): 
-        """Encrypts file and outputs it to specific encrypted directory"""
+        '''Encrypts file and outputs it to specific encryped directory'''
 
         encrypted_directory_path = self.create_encrypted_files_directory() 
         encrypted_directory_path = UtilityEngine.process_path(encrypted_directory_path)
@@ -199,7 +199,7 @@ class DecryptionEngine(CryptoEngine):
     def decrypt_file_name(self, encrypted_file_name: str) -> str: 
         file_name = self.decrypt_file_extension(encrypted_file_name) 
         decrypted_file_name = self.ceasars_cipher_decrypt(file_name) 
-
+        
         return decrypted_file_name
 
     def decrypt_file(self, password: bytes, encrypted_file_path: str) -> None:

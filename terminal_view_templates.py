@@ -1,9 +1,15 @@
 # MARK: - Terminal View Templates 
 
 templates = {
+    'intro': {
+        'banner': [
+            'Welcome to PyCriptik File Encryptor\n',
+            '^_^'
+        ]
+    }, 
     'main': {
-        'header': [
-            "Please choose one of the following options\n\n"
+        'header': [ 
+            'Please choose one of the following goodies down below.\n\n'
         ], 
         'menu_choices': [
             "[X] Compression\n",
@@ -12,24 +18,25 @@ templates = {
             "[ ] Exit Program\n"
         ],
         'footer': [
-            "\npress [ enter ] to proceed with selected option.\n" 
+            "\npress [ enter ] to proceed with the selected option.\n" 
         ]
     }, 
     'compression_main': {
         'header': [
-            "Welcome to the compression engine...\nChoose a following compression scheme\n"
+            "Welcome to the compression engine...",
+            ' Choose a following compression scheme\n'
         ],
         'menu_choices': [
             "[X] RAR\n",
             "[ ] Return to main menu\n"
         ],
         "footer": [
-            "\npress [ enter ] to proceed with selected option.\n" 
+            "\npress [ enter ] to proceed with the selected option.\n" 
         ]
     },
     'compression_yes_or_no_options': {
         'header': [
-            "Do you wish to compress the file\n"
+            "Do you wish to compress the file\n\n"
         ],
         'menu_choices': [
             '[X] Yes\n',
