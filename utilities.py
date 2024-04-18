@@ -69,6 +69,21 @@ class FilePathProcessingUtilities():
     @staticmethod
     def get_file_name_out_of_path(file_path: str) -> str:
         return os.path.basename(file_path) 
+    
+    @staticmethod
+    def is_the_file_path_a_directory(file_path: str) -> bool:
+        return os.path.isdir(file_path)
+    
+    @staticmethod
+    def get_file_path_directory_child_directories(directory_path: str) -> list:
+        child_folders = []
+        files = os.listdir(directory_path) 
+
+        for file in files: 
+            child_file_path = FilePathProcessingUtilities.process_path(os.path.join(directory_path, file))
+            child_folders.append((file, child_file_path))
+
+        return child_folders
 
 # MARK: - String Utilities 
         

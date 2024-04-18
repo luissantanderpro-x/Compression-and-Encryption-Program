@@ -34,6 +34,11 @@ templates = {
             "\npress [ enter ] to proceed with the selected option.\n" 
         ]
     },
+    'compression_select_file': {
+        'header': [''],
+        'menu_choices': [],
+        'footer': ['']
+    },
     'compression_yes_or_no_options': {
         'header': [
             "Do you wish to compress the file\n\n"
