@@ -15,7 +15,6 @@ class UtilityEngine():
     def __init__(): 
         pass 
 
-
     @staticmethod
     def get_file_name_out_of_path(file_path: str) -> str: 
         return os.path.basename(file_path)

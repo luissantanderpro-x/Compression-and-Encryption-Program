@@ -39,6 +39,13 @@ templates = {
         'menu_choices': [],
         'footer': ['']
     },
+    'compression_contents_options': {
+        'header': ['Do you wish to compress entire directory or just the contents inside\n'],
+        'menu_choices': ['[X] Entire selected directory.\n',
+                         '[ ] Contents inside.\n'
+                        ],
+        'footer': ['\n press [ enter ] to proceed with the selected choice.']
+    },
     'compression_yes_or_no_options': {
         'header': [
             "Do you wish to compress the file\n\n"

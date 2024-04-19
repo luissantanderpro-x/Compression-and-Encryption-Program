@@ -118,7 +118,31 @@ class TerminalView():
                 selected_user_option = [0]
                 currently_selected = selected_user_option[0]
 
-    '''TODO: Refactored Core feature to be integrated and replaced with _prompt_selections'''
+    def _prompt_menu_options(self, menu_options: dict, functions: dict, selected_user_option=[0]): 
+        exit_value = len(functions) - 1
+
+        print('select:', selected_user_option)
+
+        currently_selected = selected_user_option[0]
+
+        header_template_array_list = menu_options.get('header')[:]
+        menu_choices_template_list = menu_options.get('menu_choices')[:]
+        footer_template = menu_options.get("footer")[:]
+
+        prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
+
+        self._prompt_user(prompt_msg, 50)
+        keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value)) 
+        keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value))  
+
+        input('') 
+
+        currently_selected = selected_user_option[0]
+
+        keyboard.unhook_all() 
+
+        return functions[currently_selected]()
+
     def _prompt_menu_options_loop(self, menu_options: dict, functions: dict):
         selected_user_option = [0]
         currently_selected = selected_user_option[0]
@@ -136,26 +160,6 @@ class TerminalView():
                 currently_selected = exit_value
 
         return res
-
-    def _prompt_menu_options(self, menu_options: dict, functions: dict, selected_user_option=[0]): 
-        exit_value = len(functions) - 1
-
-        print('select:', selected_user_option)
-        header_template_array_list = menu_options.get('header')[:]
-        menu_choices_template_list = menu_options.get('menu_choices')[:]
-        footer_template = menu_options.get("footer")[:]
-
-        prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
-
-        self._prompt_user(prompt_msg, 50)
-        keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value)) 
-        keyboard.on_press_key('down', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value))  
-
-        input('') 
-
-        keyboard.unhook_all() 
-
-        return functions[selected_user_option[0]]()
 
 # MARK: - Compression Engine Terminal UI Prompts
 
@@ -177,7 +181,6 @@ class CompressionEngineTerminalUIView(TerminalView):
         print(f"result: {result}")
         input("press enter to proceed forward\n:") 
 
-        return 1
     
     '''TODO: NEW CORE FEATURE OF FILE SELECTION'''
     def __compression_file_select_prompt(self, file_path: str): 
@@ -229,17 +232,28 @@ class CompressionEngineTerminalUIView(TerminalView):
         file_path = input('file path: ') 
         file_path = FilePathProcessingUtilities.process_path(file_path)
 
-        # if (FilePathProcessingUtilities.is_the_file_path_a_directory(file_path)):
-        #     self.__compression_file_select_prompt(file_path)
+
+
+        if (FilePathProcessingUtilities.is_the_file_path_a_directory(file_path)):
+            chosen_file_path = self.__compression_file_select_prompt(file_path)
+
+            file_path = chosen_file_path
+        else:
+            print('this is a file not directory') 
+
 
         functions = {
-            0: lambda: self._proceed(self.__compress_file_to_rar, file_path), 
-            1: lambda: self._exit(1, 'going back to previous menu...') 
+            0: lambda: self.__compress_file_to_rar(chosen_file_path),
+            1: lambda: self._exit(1, 'exiting out of the program') 
         }
 
+        selected_choice = [0]
+                
         compression_template = templates['compression_yes_or_no_options']
-        self._prompt_selection(compression_template, functions)
-    
+        self._prompt_menu_options(compression_template, functions, selected_choice)
+
+        return 1 
+        
     def __load_functions(self) -> dict: 
         return {
             0: self.__compress_file_to_rar_prompt, 
@@ -248,7 +262,8 @@ class CompressionEngineTerminalUIView(TerminalView):
 
     def init_prompt(self): 
         main_view_template = templates['compression_main']
-        self._prompt_selection(main_view_template, self.__load_functions())
+        # self._prompt_selection(main_view_template, self.__load_functions())
+        self._prompt_menu_options_loop(main_view_template, self.__load_functions())
 
 # MARK: - Encryption Engine Terminal UI Prompts 
 
@@ -391,9 +406,9 @@ class MainTerminalView(TerminalView):
 
         self._prompt_user(banner) 
 
-        time.sleep(2)
+        time.sleep(0.5)
 
-        self._prompt_selection(view_prompt, self.__load_functions())
+        self._prompt_menu_options_loop(view_prompt, self.__load_functions())
 
 
 
