@@ -70,6 +70,11 @@ templates = {
             '\npress [ enter ] to proceed with selected option.\nNote: Must be compressed with one the following formats\n[.rar]\n'
         ]
     }, 
+    'encryption_select_file': {
+        'header': [''],
+        'menu_choices':[''],
+        'footer': ['']
+    },
     'encryption_yes_or_no_options': {
         'header': [
             'Do you wish to encrypt the file?\n\n'

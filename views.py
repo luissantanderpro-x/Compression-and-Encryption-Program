@@ -52,6 +52,43 @@ class TerminalView():
 
         return user_input
     
+    def _get_file_path_from_directories_file_tree(self, file_path: str, subtemplate: dict) -> str: 
+        chosen_file_path = '' 
+        menu_options = [] 
+
+        parent_directory_name = FilePathProcessingUtilities.get_file_name_out_of_path(file_path)
+        folder_space_away_from_parent = 3
+
+        specific_engine_select_template = subtemplate
+
+        child_files = FilePathProcessingUtilities.get_file_path_directory_child_directories(file_path)
+
+        menu_options.append(f'[X] - {parent_directory_name}\n')
+
+        functions = {}
+
+        functions[0] = lambda: file_path
+
+        key = 1 
+
+        for child_file in child_files: 
+            child_file_option = '[ ]' + (' ' * folder_space_away_from_parent) + f' | - {child_file[0]}\n'
+            menu_options.append(child_file_option)
+            child_file_path = child_file[1]
+            functions[key] = lambda path = child_file_path: path
+            key += 1
+
+        menu_options.append('[ ] return to main menu')
+
+        specific_engine_select_template['menu_choices'] = menu_options
+
+        functions[key] = lambda: self._exit(len(functions) - 1, 'returning to previous menu') 
+
+        chosen_file_path = self._prompt_menu_options(specific_engine_select_template, functions) 
+
+        return chosen_file_path
+        
+    
     def on_arrow_key(self, event, header_template_array_list, currently_selected_option: list, menu_options_template, footer_template, limit=4):
         if (event.event_type == keyboard.KEY_DOWN):
             if event.name == 'up':
@@ -161,7 +198,7 @@ class TerminalView():
 
         return res
 
-# MARK: - Compression Engine Terminal UI Prompts
+# MARK: - Compression Terminal View
 
 class CompressionEngineTerminalUIView(TerminalView):
     def __init__(self): 
@@ -181,48 +218,12 @@ class CompressionEngineTerminalUIView(TerminalView):
         print(f"result: {result}")
         input("press enter to proceed forward\n:") 
 
-    def __compression_file_select_prompt(self, file_path: str): 
-        print('Chosen path is a directory...') 
-        chosen_file_path = '' 
-        menu_options = []
-
-        parent_directory_name = FilePathProcessingUtilities.get_file_name_out_of_path(file_path)
-        folder_space_away_from_parent = 3 
-
-        compression_select_template: dict = templates['compression_select_file']
-
-        child_files = FilePathProcessingUtilities.get_file_path_directory_child_directories(file_path)
-
-        menu_options.append(f'[X] - {parent_directory_name}\n')
-
-        functions = {}
-
-        functions[0] = lambda: file_path
-
-        key = 1
-
-        for child_file in child_files: 
-            child_file_option = '[ ]' + (' ' * folder_space_away_from_parent) + f' | - {child_file[0]}\n'
-            menu_options.append(child_file_option)
-            child_file_path = child_file[1]
-            functions[key] = lambda path = child_file_path: path
-            key += 1
-
-        menu_options.append('[ ] return to main menu')
-            
-        compression_select_template['menu_choices'] = menu_options
-
-        functions[key] = lambda: self._exit(len(functions) - 1, 'returning to previous menu') 
-
-        chosen_file_path = self._prompt_menu_options(compression_select_template, functions) 
-
-        return chosen_file_path
-
     # MARK: - TESTING BREAKPOINT [1]
 
     '''for testing private function __compress_file_to_rar_prompt'''
     def test_compress_file_to_rar_localized_func(self, test_file_path: str): 
-        return self.__compression_file_select_prompt(test_file_path)
+        return self._get_file_path_from_directories_file_tree(test_file_path, templates['comporess_select_file'])
+    
     
     '''================================'''
 
@@ -234,15 +235,13 @@ class CompressionEngineTerminalUIView(TerminalView):
         file_path = FilePathProcessingUtilities.process_path(file_path)
 
         if (FilePathProcessingUtilities.is_the_file_path_a_directory(file_path)):
-            chosen_file_path = self.__compression_file_select_prompt(file_path)
-
-            file_path = chosen_file_path
+            file_path = self._get_file_path_from_directories_file_tree(file_path, templates['compression_select_file'])
         else:
             print('this is a file not directory') 
 
 
         functions = {
-            0: lambda: self.__compress_file_to_rar(chosen_file_path),
+            0: lambda: self.__compress_file_to_rar(file_path),
             1: lambda: self._exit(1, 'exiting out of the program') 
         }
 
@@ -263,8 +262,8 @@ class CompressionEngineTerminalUIView(TerminalView):
         main_view_template = templates['compression_main']
         # self._prompt_selection(main_view_template, self.__load_functions())
         self._prompt_menu_options_loop(main_view_template, self.__load_functions())
-
-# MARK: - Encryption Engine Terminal UI Prompts 
+        
+# MARK: - Encryption Terminal View 
 
 class EncryptionEngineTerminalUIView(TerminalView):
     def __init__(self) -> None:
@@ -281,11 +280,18 @@ class EncryptionEngineTerminalUIView(TerminalView):
         input('press enter to return to main menu\n:')
 
         return 1
-
+    
     def __encrypt_file_prompt(self): 
         print("Enter a file path or drag file onto terminal if you wish to encrypt\n") 
 
         file_path = input('compressed file path: ') 
+        file_path = FilePathProcessingUtilities.process_path(file_path)
+
+        if (FilePathProcessingUtilities.is_the_file_path_a_directory(file_path)):
+            file_path = self._get_file_path_from_directories_file_tree(file_path, templates['encryption_select_file'])
+        else:
+            print('this is file path is not a directory.') 
+
 
         UtilityEngine.clear_terminal()
 
@@ -300,7 +306,7 @@ class EncryptionEngineTerminalUIView(TerminalView):
                 print("Error: Passwords don't match enter again")
             
         functions = {
-            0: lambda: self._proceed(self.__encrypt_file, file_path, hashed_password_one), 
+            0: lambda: self.__encrypt_file(file_path, hashed_password_one),
             1: lambda: self._exit(1, 'going back to previous menu...')    
         }
 
@@ -316,9 +322,9 @@ class EncryptionEngineTerminalUIView(TerminalView):
 
     def init_prompt(self):
         encryption_main_view_template = templates['encryption_main']
-        self._prompt_selection(encryption_main_view_template, self.__load_functions())
+        self._prompt_menu_options_loop(encryption_main_view_template, self.__load_functions())
 
-# MARK: - Decryption Engine Terminal UI Prompts
+# MARK: - Decryption Engine Terminal View
 
 class DecryptionEngineTerminalUIView(TerminalView):
     def __init__(self):
@@ -372,7 +378,7 @@ class DecryptionEngineTerminalUIView(TerminalView):
 
     def init_prompt(self):
         decryption_main_view_template = templates['decryption_main']
-        self._prompt_selection(decryption_main_view_template, self.__load_functions())
+        self._prompt_menu_options_loop(decryption_main_view_template, self.__load_functions())
         
 # MARK: - Main Terminal View
 
