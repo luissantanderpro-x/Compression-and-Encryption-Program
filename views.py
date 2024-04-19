@@ -181,8 +181,6 @@ class CompressionEngineTerminalUIView(TerminalView):
         print(f"result: {result}")
         input("press enter to proceed forward\n:") 
 
-    
-    '''TODO: NEW CORE FEATURE OF FILE SELECTION'''
     def __compression_file_select_prompt(self, file_path: str): 
         print('Chosen path is a directory...') 
         chosen_file_path = '' 
@@ -202,6 +200,7 @@ class CompressionEngineTerminalUIView(TerminalView):
         functions[0] = lambda: file_path
 
         key = 1
+
         for child_file in child_files: 
             child_file_option = '[ ]' + (' ' * folder_space_away_from_parent) + f' | - {child_file[0]}\n'
             menu_options.append(child_file_option)
@@ -219,7 +218,9 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         return chosen_file_path
 
-    '''for testing'''
+    # MARK: - TESTING BREAKPOINT [1]
+
+    '''for testing private function __compress_file_to_rar_prompt'''
     def test_compress_file_to_rar_localized_func(self, test_file_path: str): 
         return self.__compression_file_select_prompt(test_file_path)
     
@@ -231,8 +232,6 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         file_path = input('file path: ') 
         file_path = FilePathProcessingUtilities.process_path(file_path)
-
-
 
         if (FilePathProcessingUtilities.is_the_file_path_a_directory(file_path)):
             chosen_file_path = self.__compression_file_select_prompt(file_path)
