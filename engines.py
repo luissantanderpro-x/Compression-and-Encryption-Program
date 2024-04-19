@@ -15,21 +15,31 @@ from cryptography.hazmat.backends import default_backend
 
 class CryptoEngine():
     def __init__(self):
-        self.salt = b'salt_value'
+        pass
+
+    def get_salt_from_config_file(self, file_path: str) -> bytes: 
+        salt_value = b'' 
+
+        with open(file_path, 'rb') as file: 
+            salt_value = file.readline() 
+
+        return salt_value
     
-    def crypto_hashing_processor(self, password_bytes, data_bytes):
+    def crypto_hashing_processor(self, password: bytes, data: bytes) -> Fernet: 
+        salt_value = self.get_salt_from_config_file(r'secret.txt') 
+
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(), 
             length=32,
-            salt=self.salt,
+            salt=salt_value,
             iterations=1000,
             backend=default_backend()
         )
 
-        key = kdf.derive(password_bytes)
+        key = kdf.derive(password)
         cipher = Fernet(base64.urlsafe_b64encode(key))
 
-        return cipher.encrypt(data_bytes) 
+        return cipher.encrypt(data) 
     
     def ceasars_cipher_encrypt(self, string_data, shift=3): 
         encrypted_text = "" 
@@ -111,7 +121,7 @@ class EncryptionEngine(CryptoEngine):
         return cipher.encrypt(data_bytes) 
 
     def encrypt_password(self, password: str): 
-        salt_value = b'salt-123'
+        salt_value = self.get_salt_from_config_file(r'secret.txt')
 
         password_bytes = UtilityEngine.transform_to_utf_8_bytes_string(password) 
 

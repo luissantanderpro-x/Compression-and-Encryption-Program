@@ -2,6 +2,7 @@
 secret.txt
 
 # Ignore Specfic Directories 
+/config/
 /testing/
 /compressed_files/
 /encrypted_files/

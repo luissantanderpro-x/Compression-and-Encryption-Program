@@ -15,6 +15,18 @@ CURRENT_WORKING_DIRECTORY = os.getcwd()
 
 class TestCryptoEngines(unittest.TestCase):
 
+    # MARK: - Test Salt Value
+    
+    '''Test if salt value was extracted from a file.'''
+    def test_get_salt_from_config_file(self):
+        crypto_engine = CryptoEngine() 
+
+        file_path = r'testing\secret_test.txt'
+
+        res = crypto_engine.get_salt_from_config_file(file_path)
+
+        self.assertEqual('test_salt', res) 
+
     # MARK: - Test if compressed files output directory got created 
 
     def test_if_compressed_files_output_directory_exists(self): 
@@ -126,7 +138,7 @@ class TestCryptoEngines(unittest.TestCase):
     # MARK: Check if File is rar Compressed Test
 
     def test_if_file_is_rar_compressed(self): 
-        file_path = r"C:\Users\George Santander\Desktop\Compression and Encryption Program\testing\Lyft and Uber Side Hustle Business Documents.rar"
+        file_path = r'testing\things'
         
         is_compressed = CompressionEngine.is_file_rar_compressed(file_path) 
 
