@@ -86,7 +86,7 @@ class CompressionEngine(CryptoEngine):
             output_rar_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_rar_file_name)
 
             try:
-                subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep', output_rar_file_path_placement, file_path_of_file_to_compress])
+                subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep1', output_rar_file_path_placement, file_path_of_file_to_compress])
             except Exception as e:
                 result = e 
         else: 
