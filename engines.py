@@ -6,10 +6,11 @@ from dependencies import subprocess
 from utilities import UtilityEngine
 from utilities import StringUtilities
 
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+
 
 # MARK: - Crypto Engine
 
@@ -120,7 +121,7 @@ class EncryptionEngine(CryptoEngine):
         cipher = Fernet(encrypted_password)
         return cipher.encrypt(data_bytes) 
 
-    def encrypt_password(self, password: str): 
+    def encrypt_password(self, password: str) -> bytes:
         salt_value = self.get_salt_from_config_file(r'secret.txt')
 
         password_bytes = UtilityEngine.transform_to_utf_8_bytes_string(password) 
@@ -212,7 +213,7 @@ class DecryptionEngine(CryptoEngine):
         
         return decrypted_file_name
 
-    def decrypt_file(self, password: bytes, encrypted_file_path: str) -> None:
+    def decrypt_file(self, password: bytes, encrypted_file_path: str) -> bool:
         """Decrypts file and outputs it to decrypted_files directory"""
 
         decrypted_directory_path = self.create_decrypted_files_directory()
@@ -226,8 +227,16 @@ class DecryptionEngine(CryptoEngine):
         with open(encrypted_file_path, 'rb') as encrypted_file: 
             data = encrypted_file.read()
 
-            decrypted_data = self.decrypt_data(password, data)
-            decrypted_file_path = os.path.join(decrypted_directory_path, decrypted_file_name)
+            try: 
+                decrypted_data = self.decrypt_data(password, data)
+                decrypted_file_path = os.path.join(decrypted_directory_path, decrypted_file_name)
 
-            with open(decrypted_file_path, 'wb') as decrypted_file: 
-                decrypted_file.write(decrypted_data) 
+                with open(decrypted_file_path, 'wb') as decrypted_file: 
+                    decrypted_file.write(decrypted_data) 
+
+                    return True
+
+            except InvalidToken: 
+                print('Invalid password unable to decrypt file ')
+                return False 
+

@@ -115,8 +115,8 @@ class TestCryptoEngines(unittest.TestCase):
     def test_decrypt_file_name(self): 
         crypto = DecryptionEngine() 
 
-        test_encrypted_file_name = "whvwhg_ilohxudu"
-        expected_decrypted_file_name = "tested_file.rar" 
+        test_encrypted_file_name = "Shuvrqdo Grfxphqwvxudu"
+        expected_decrypted_file_name = "Personal Documents.rar" 
 
         decrypted_file_name = crypto.decrypt_file_name(test_encrypted_file_name)
 
@@ -160,3 +160,21 @@ class TestCryptoEngines(unittest.TestCase):
         decrypted_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'decrypted_files', 'things.rar') 
 
         self.assertTrue(os.path.exists(decrypted_file_path)) 
+
+    # MARK: - Check Password
+
+    # py -m unittest discover -k test_password_validation_by_using_wrong_password
+
+    def test_password_validation_by_using_wrong_password(self): 
+        dec_engine = DecryptionEngine() 
+        enc_engine = EncryptionEngine() 
+
+        password = 'wrong-password'
+
+        encrypted_password = enc_engine.encrypt_password(password) 
+
+        encrypted_file_path = r'C:\Users\George Santander\Desktop\Compression and Encryption Program\encrypted_files\Shuvrqdo Grfxphqwvxudu'
+
+        res = dec_engine.decrypt_file(encrypted_password, encrypted_file_path)
+
+        self.assertFalse(res)

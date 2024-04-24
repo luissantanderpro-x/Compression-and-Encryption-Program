@@ -292,7 +292,6 @@ class EncryptionEngineTerminalUIView(TerminalView):
         else:
             print('this is file path is not a directory.') 
 
-
         UtilityEngine.clear_terminal()
 
         hashed_password_one = b'1'
@@ -354,8 +353,7 @@ class DecryptionEngineTerminalUIView(TerminalView):
         return 1
 
     def __decryption_file_prompt(self):
-        print('Enter a encrypted file you wish to decrypt!')
-
+        print('Enter file path of encrypted file you wish to decrypt.')
         encrypted_file_path = input('encrypted file path: ') 
 
         UtilityEngine.clear_terminal()
@@ -364,6 +362,11 @@ class DecryptionEngineTerminalUIView(TerminalView):
 
         if (FilePathProcessingUtilities.check_if_file_path_exists(encrypted_file_path)):
             hashed_password = self.__get_password_from_user() 
+
+
+            # TODO: Check if Password is Valid before decrypting the file to prevent errors
+            # before attempting to derypt entire file. 
+
             self.__decrypt_the_file(hashed_password, encrypted_file_path)
         else:
             print(f'File path: {encrypted_file_path} does not exists...')
