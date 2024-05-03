@@ -42,7 +42,7 @@ class CryptoEngine():
 
         return cipher.encrypt(data) 
     
-    def ceasars_cipher_encrypt(self, string_data, shift=3): 
+    def caesars_cipher_encrypt(self, string_data, shift=3): 
         encrypted_text = "" 
 
         for char in string_data:
@@ -56,8 +56,8 @@ class CryptoEngine():
 
         return encrypted_text
     
-    def ceasars_cipher_decrypt(self, string_data, shift=3): 
-        decrypted_text = self.ceasars_cipher_encrypt(string_data, shift * -1)
+    def caesars_cipher_decrypt(self, string_data, shift=3): 
+        decrypted_text = self.caesars_cipher_encrypt(string_data, shift * -1)
         return decrypted_text
     
 # MARK: - Compression Engine
@@ -77,7 +77,7 @@ class CompressionEngine(CryptoEngine):
         except FileExistsError:
             print("Directory compressed_files_output already exists")
         except Exception as e:
-            print("Uknown error occurred.....") 
+            print("Unknown error occurred.....") 
             
     def compress_directory_to_rar(self, file_path_of_file_to_compress) -> str:
         result = "file compressed successfully...." 
@@ -144,7 +144,7 @@ class EncryptionEngine(CryptoEngine):
     
     def encrypt_file_name(self, file_name: str): 
         file_name = self.encrypt_file_extension(file_name)
-        encrypted_file_name = self.ceasars_cipher_encrypt(file_name) 
+        encrypted_file_name = self.caesars_cipher_encrypt(file_name) 
 
         return encrypted_file_name
     
@@ -209,7 +209,7 @@ class DecryptionEngine(CryptoEngine):
 
     def decrypt_file_name(self, encrypted_file_name: str) -> str: 
         file_name = self.decrypt_file_extension(encrypted_file_name) 
-        decrypted_file_name = self.ceasars_cipher_decrypt(file_name) 
+        decrypted_file_name = self.caesars_cipher_decrypt(file_name) 
         
         return decrypted_file_name
 
