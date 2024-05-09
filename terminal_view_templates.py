@@ -24,10 +24,11 @@ templates = {
     'compression_main': {
         'header': [
             "Welcome to the compression engine...",
-            ' Choose a following compression scheme\n'
+            ' Choose a following compression schemes.\n'
         ],
         'menu_choices': [
-            "[X] RAR\n",
+            '[X] RAR\n',
+            '[ ] ZIP\n',
             "[ ] Return to main menu\n"
         ],
         "footer": [

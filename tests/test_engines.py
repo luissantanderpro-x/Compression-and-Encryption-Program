@@ -35,22 +35,39 @@ class TestCryptoEngines(unittest.TestCase):
 
         self.assertTrue(os.path.exists('compressed_files_output')) 
 
-    # MARK: - Test if Compression Engine compressed specified file 
+    # MARK: - Compression Tests
 
+    '''Test if file got compressed to rar format '''
     def test_if_file_got_compressed_to_rar(self): 
         comp_engine = CompressionEngine() 
 
         file_path_of_file_to_be_compressed = os.path.join(CURRENT_WORKING_DIRECTORY, 'testing', 'things')
 
-        expected_compressed_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'things.rar') 
+        expected_compressed_file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files', 'things.rar') 
 
         comp_engine.compress_directory_to_rar(file_path_of_file_to_be_compressed) 
 
         self.assertTrue(os.path.exists(expected_compressed_file_path))
 
-    # MARK: - Encrypt File Name Test
+    '''Test if file got compressed to zip format'''
+    '''py -m unittest discover -k est_if_file_got_compressed_to_zip'''
+    def test_if_file_got_compressed_to_zip(self): 
+        comp_engine = CompressionEngine() 
+
+        file_path_of_file_to_be_compressed = os.path.join(CURRENT_WORKING_DIRECTORY, 'testing', 'things')
+
+        expected_file = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files', 'things.zip')
+
+        comp_engine.compress_directory_to_zip(file_path_of_file_to_be_compressed)
+
+        self.assertTrue(os.path.exists(expected_file)) 
+
+    # MARK: - Encryption Test
 
     def test_encrypting_file_name(self): 
+        '''
+        Tests encrypting the file name. 
+        '''
         enc_engine = EncryptionEngine() 
 
         test_file_name = 'tested_file.rar'
@@ -68,13 +85,12 @@ class TestCryptoEngines(unittest.TestCase):
             f'Result: {result}\n'
         )
 
-        print(params)
-
+        print(params) 
+        
         self.assertEqual(expected_encrypted_file_name, result) 
 
-    # MARK: - Encrypt Password Test
-
     def test_encrypt_password(self): 
+        '''Test encrypting a password by hashing it.'''
         enc_engine = EncryptionEngine() 
 
         tested_password = "abc123"
@@ -86,13 +102,12 @@ class TestCryptoEngines(unittest.TestCase):
 
         print(encrypted_password) 
 
-
         self.assertGreater(encrypted_password_len, tested_password_len)
 
     # MARK: - Encrypted File Exists Test 
 # py -m unittest discover -k test_encrypt_compressed_file
     def test_encrypt_compressed_file(self): 
-        """tests if file got encrypted successfully......"""
+        """Tests if file got encrypted successfully......"""
         
         enc_engine = EncryptionEngine() 
 

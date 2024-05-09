@@ -41,10 +41,9 @@ class TerminalView():
 
         print(prompt_display)
         
-
     def _get_user_input(self, input_msg: str, type="str"): 
         user_input = None
-        
+
         if (type == 'int'):
             user_input = int(input(input_msg))
         else: 
@@ -107,20 +106,18 @@ class TerminalView():
 
                     menu_options_template[currently_selected_option[0]] = StringUtilities.replace_char_at_index(menu_options_template[currently_selected_option[0]], 1, "X") 
             
-            prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_options_template, footer_template) 
+            prompt_msg = self.merge_multiple_string_arrays_into_msg(header_template_array_list, menu_options_template, footer_template) 
 
             '''Refreshes the screen everytime user moves the cursor'''
             self._prompt_user(prompt_msg, 50)
 
     # TODO: Place in String Utilities when Refactoring
 
-    def merge_multiplpe_string_arrays_into_msg(self, *args) -> str: 
+    def merge_multiple_string_arrays_into_msg(self, *args) -> str: 
         msg = ""
-
         for template in args: 
             template_msg = "".join(template) 
             msg += template_msg
-
         return msg
                     
     def _prompt_selection(self, menu_options: dict, functions: dict, *args): 
@@ -135,7 +132,7 @@ class TerminalView():
             menu_choices_template_list = menu_options.get('menu_choices')[:]
             footer_template = menu_options.get("footer")[:]
 
-            prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
+            prompt_msg = self.merge_multiple_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
 
             self._prompt_user(prompt_msg, 50)
             keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value)) 
@@ -166,7 +163,7 @@ class TerminalView():
         menu_choices_template_list = menu_options.get('menu_choices')[:]
         footer_template = menu_options.get("footer")[:]
 
-        prompt_msg = self.merge_multiplpe_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
+        prompt_msg = self.merge_multiple_string_arrays_into_msg(header_template_array_list, menu_choices_template_list, footer_template)
 
         self._prompt_user(prompt_msg, 50)
         keyboard.on_press_key('up', lambda event: self.on_arrow_key(event, header_template_array_list, selected_user_option, menu_choices_template_list, footer_template, exit_value)) 
@@ -222,12 +219,29 @@ class CompressionEngineTerminalUIView(TerminalView):
 
     '''for testing private function __compress_file_to_rar_prompt'''
     def test_compress_file_to_rar_localized_func(self, test_file_path: str): 
-        return self._get_file_path_from_directories_file_tree(test_file_path, templates['comporess_select_file'])
+        return self._get_file_path_from_directories_file_tree(test_file_path, templates['compression_select_file'])
     
-    
-    '''================================'''
+    def __compress_file_to_zip(self, file_path: str) -> int:
+        '''
+        Compresses file / directory using zip compression.
+        '''
+        res = -1 
+        current_working_directory = self.engine.get_current_working_directory() 
 
-    def __compress_file_to_rar_prompt(self): 
+        self.engine.create_compressed_files_directory(current_working_directory) 
+
+        file_path = UtilityEngine.process_path(file_path) 
+
+        result = self.engine.compress_directory_to_zip(file_path) 
+
+        print(f'result: {result}')
+        input('press enter to proceed forward\n:')
+
+        if (result == 'file compressed successfully...'):
+            res = 1 
+        return res 
+        
+    def __get_selected_file_path_prompt(self) -> str: 
         UtilityEngine.clear_terminal()
         print('Enter file path or drop a file / directory.')
 
@@ -239,6 +253,12 @@ class CompressionEngineTerminalUIView(TerminalView):
         else:
             print('this is a file not directory') 
 
+        return file_path 
+    
+    def __compress_file_to_rar_prompt(self) -> int: 
+        print('rar prompt')
+
+        file_path = self.__get_selected_file_path_prompt() 
 
         functions = {
             0: lambda: self.__compress_file_to_rar(file_path),
@@ -250,17 +270,35 @@ class CompressionEngineTerminalUIView(TerminalView):
         compression_template = templates['compression_yes_or_no_options']
         self._prompt_menu_options(compression_template, functions, selected_choice)
 
-        return 1 
+        return 2
+    
+    def __compress_file_to_zip_prompt(self):
+        print('zip prompt') 
+
+        file_path = self.__get_selected_file_path_prompt() 
+
+        functions = {
+            0: lambda: self.__compress_file_to_zip(file_path),
+            1: lambda: self._exit(2, 'exiting out of the program') 
+        }
+
+        compression_template = templates['compression_yes_or_no_options']
+
+        selected_choice = [0]
+
+        self._prompt_menu_options(compression_template, functions, selected_choice) 
+
+        return 2 
         
     def __load_functions(self) -> dict: 
         return {
-            0: self.__compress_file_to_rar_prompt, 
-            1: lambda: self._exit(1, "exiting compression engine....")
+            0: self.__compress_file_to_rar_prompt,
+            1: self.__compress_file_to_zip_prompt, 
+            2: lambda: self._exit(2, "exiting compression engine....")
         }
 
     def init_prompt(self): 
         main_view_template = templates['compression_main']
-        # self._prompt_selection(main_view_template, self.__load_functions())
         self._prompt_menu_options_loop(main_view_template, self.__load_functions())
         
 # MARK: - Encryption Terminal View 
@@ -410,7 +448,7 @@ class MainTerminalView(TerminalView):
         view_prompt = templates['main']
         intro_template = templates['intro'].get('banner') 
 
-        banner = self.merge_multiplpe_string_arrays_into_msg(intro_template)
+        banner = self.merge_multiple_string_arrays_into_msg(intro_template)
 
         self._prompt_user(banner) 
 

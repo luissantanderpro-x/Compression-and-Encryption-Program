@@ -2,6 +2,7 @@
 from dependencies import os
 from dependencies import base64
 from dependencies import subprocess
+from dependencies import zipfile
 
 from utilities import UtilityEngine
 from utilities import StringUtilities
@@ -43,6 +44,7 @@ class CryptoEngine():
         return cipher.encrypt(data) 
     
     def caesars_cipher_encrypt(self, string_data, shift=3): 
+        '''caesars cipher algorithm'''
         encrypted_text = "" 
 
         for char in string_data:
@@ -79,21 +81,38 @@ class CompressionEngine(CryptoEngine):
         except Exception as e:
             print("Unknown error occurred.....") 
             
-    def compress_directory_to_rar(self, file_path_of_file_to_compress) -> str:
+    def compress_directory_to_rar(self, file_path_of_file_to_compress: str) -> str:
         result = "file compressed successfully...." 
 
         if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
             output_rar_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.rar"
             output_rar_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_rar_file_name)
-
             try:
                 subprocess.run([r"C:\Program Files\WinRAR\WinRAR.exe", 'a', '-r', '-ep1', output_rar_file_path_placement, file_path_of_file_to_compress])
             except Exception as e:
                 result = e 
         else: 
-            result = "Invalid path provided unable to compress file" 
+            result = 'Invalid path provided unable to compress file.'
 
         return result 
+    
+    def compress_directory_to_zip(self, file_path_of_file_to_compress: str) -> str: 
+        result = 'file compressed successfully...'
+        if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
+            output_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.zip"
+            output_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_file_name) 
+            try:
+                with zipfile.ZipFile(output_file_path_placement, 'w', compression=zipfile.ZIP_BZIP2) as zipf:
+                    zipf.write(file_path_of_file_to_compress)
+            except Exception as e:
+                result = e 
+        else:
+            result = 'Invalid path provided unable to compress file.'
+        return result
+    
+    # TODO: Implement this function
+    def compress_directory_to_tar(self):
+        pass 
     
     @staticmethod
     def is_file_rar_compressed(file_name: str) -> bool: 
@@ -113,7 +132,7 @@ class EncryptionEngine(CryptoEngine):
         except FileExistsError:
             print("Directory encrypted_files already exists")
         except Exception as e:
-            print("Uknown error occurred.....") 
+            print("Unknown error occurred.....") 
 
         return encrypted_file_directory
 
@@ -143,14 +162,24 @@ class EncryptionEngine(CryptoEngine):
         return StringUtilities.replace_char_at_index(file_name, -4, 'u') 
     
     def encrypt_file_name(self, file_name: str): 
+        '''
+        Encrypts the file by masking it so no one can know what the file is once encrypted. 
+        '''
         file_name = self.encrypt_file_extension(file_name)
         encrypted_file_name = self.caesars_cipher_encrypt(file_name) 
-
         return encrypted_file_name
     
     def encrypt_file(self, password: bytes, compressed_file_path: str): 
-        '''Encrypts file and outputs it to specific encryped directory'''
+        '''
+        Encrypts file and outputs it to specified encrypted directory.
+        
+        Parameters:
+        password (bytes): password bytes. 
+        compressed_file_path (str): compressed file path
 
+        Returns:
+        None
+        '''
         encrypted_directory_path = self.create_encrypted_files_directory() 
         encrypted_directory_path = UtilityEngine.process_path(encrypted_directory_path)
 
@@ -197,6 +226,7 @@ class DecryptionEngine(CryptoEngine):
         return cipher.decrypt(data)
 
     def decrypt_password(self, password: str):
+        '''decrypts user hashed password'''
         enc_engine = EncryptionEngine() 
         password_bytes = StringUtilities.transform_to_utf_8_bytes_string(password)
 
