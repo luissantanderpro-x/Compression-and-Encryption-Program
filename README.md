@@ -4,7 +4,12 @@ Description: A file processing tool that has features such as compression, encry
 
 Current Features 
 ----------------------------
-- Compression by invoking WinRAR and using rar compression on a directory or file. 
+### Compression
+- compresses files or directories using the following compression schemes. 
+  - RAR - invoking WinRAR if available. 
+  - ZIP
+  - TAR 
+
 - Encryption using SHA-256 algorithm with password protect. 
 - Obfuscate encrypted file name to make encrypted files appear random.
 - Decryption of encrypted data. 

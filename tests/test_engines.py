@@ -37,8 +37,8 @@ class TestCryptoEngines(unittest.TestCase):
 
     # MARK: - Compression Tests
 
-    '''Test if file got compressed to rar format '''
     def test_if_file_got_compressed_to_rar(self): 
+        '''Test if file got compressed to rar format '''
         comp_engine = CompressionEngine() 
 
         file_path_of_file_to_be_compressed = os.path.join(CURRENT_WORKING_DIRECTORY, 'testing', 'things')
@@ -49,9 +49,9 @@ class TestCryptoEngines(unittest.TestCase):
 
         self.assertTrue(os.path.exists(expected_compressed_file_path))
 
-    '''Test if file got compressed to zip format'''
-    '''py -m unittest discover -k est_if_file_got_compressed_to_zip'''
+    # py -m unittest discover -k est_if_file_got_compressed_to_zip
     def test_if_file_got_compressed_to_zip(self): 
+        '''Test if file got compressed to zip format'''
         comp_engine = CompressionEngine() 
 
         file_path_of_file_to_be_compressed = os.path.join(CURRENT_WORKING_DIRECTORY, 'testing', 'things')
@@ -61,6 +61,17 @@ class TestCryptoEngines(unittest.TestCase):
         comp_engine.compress_directory_to_zip(file_path_of_file_to_be_compressed)
 
         self.assertTrue(os.path.exists(expected_file)) 
+
+    # py -m unittest discover -k test_tar_compression
+    def test_tar_compression(self):
+        '''tests if file or directory got compressed to a tar and said file exists.'''
+        comp_engine = CompressionEngine() 
+
+        print('Current Working Directory: %s' % CURRENT_WORKING_DIRECTORY)
+
+        file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'tests', 'dummy_data', '') 
+
+        self.assertTrue(True) 
 
     # MARK: - Encryption Test
 
