@@ -18,7 +18,7 @@ Current Features
 - Decryption of encrypted data. 
 
 How To Run 
-
+----------------------------
 py main.py 
 
 Future features to be added:
