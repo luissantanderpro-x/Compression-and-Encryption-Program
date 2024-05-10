@@ -17,6 +17,10 @@ Current Features
 ### Decryption 
 - Decryption of encrypted data. 
 
+How To Run 
+
+py main.py 
+
 Future features to be added:
 ----------------------------
 - cross platform compatibility with Mac OS X, Linux and Windows. 
