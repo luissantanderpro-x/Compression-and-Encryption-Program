@@ -29,6 +29,7 @@ templates = {
         'menu_choices': [
             '[X] RAR\n',
             '[ ] ZIP\n',
+            '[ ] TAR\n', 
             "[ ] Return to main menu\n"
         ],
         "footer": [

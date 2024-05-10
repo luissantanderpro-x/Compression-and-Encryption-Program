@@ -3,6 +3,7 @@ from dependencies import os
 from dependencies import base64
 from dependencies import subprocess
 from dependencies import zipfile
+from dependencies import tarfile
 
 from utilities import UtilityEngine
 from utilities import StringUtilities
@@ -12,7 +13,6 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 
-
 # MARK: - Crypto Engine
 
 class CryptoEngine():
@@ -21,10 +21,8 @@ class CryptoEngine():
 
     def get_salt_from_config_file(self, file_path: str) -> bytes: 
         salt_value = b'' 
-
         with open(file_path, 'rb') as file: 
             salt_value = file.readline() 
-
         return salt_value
     
     def crypto_hashing_processor(self, password: bytes, data: bytes) -> Fernet: 
@@ -73,7 +71,6 @@ class CompressionEngine(CryptoEngine):
 
     def create_compressed_files_directory(self, directory_path):
         compressed_file_directory = os.path.join(directory_path, 'compressed_files')
-
         try: 
             os.mkdir(compressed_file_directory)
         except FileExistsError:
@@ -82,8 +79,9 @@ class CompressionEngine(CryptoEngine):
             print("Unknown error occurred.....") 
             
     def compress_directory_to_rar(self, file_path_of_file_to_compress: str) -> str:
-        result = "file compressed successfully...." 
+        '''RAR compresses a file or directory.'''
 
+        result = "file compressed successfully...." 
         if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
             output_rar_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.rar"
             output_rar_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_rar_file_name)
@@ -93,10 +91,11 @@ class CompressionEngine(CryptoEngine):
                 result = e 
         else: 
             result = 'Invalid path provided unable to compress file.'
-
         return result 
     
-    def compress_directory_to_zip(self, file_path_of_file_to_compress: str) -> str: 
+    def compress_to_zip(self, file_path_of_file_to_compress: str) -> str: 
+        '''ZIP compresses a file or directory.'''
+
         result = 'file compressed successfully...'
         if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
             output_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.zip"
@@ -110,9 +109,21 @@ class CompressionEngine(CryptoEngine):
             result = 'Invalid path provided unable to compress file.'
         return result
     
-    # TODO: Implement this function
-    def compress_directory_to_tar(self):
-        pass 
+    def compress_to_tar(self, file_path: str) -> str: 
+        '''TAR gzip compresses a file or directory.'''
+        result = 'file tar compressed successfully'
+
+        if (UtilityEngine.check_if_path_exists(file_path)):
+            output_file_name = f'{UtilityEngine.get_file_name_out_of_path(file_path)}.tar.gz'
+            output_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_file_name) 
+            try: 
+                with tarfile.open(output_file_path_placement, 'w:gz') as tar:
+                    tar.add(file_path) 
+            except Exception as e:
+                result = e 
+        else:
+            result = 'Invalid file path provided unable to TAR compress file.'
+        return result 
     
     @staticmethod
     def is_file_rar_compressed(file_name: str) -> bool: 
@@ -214,7 +225,7 @@ class DecryptionEngine(CryptoEngine):
         except FileExistsError:
             print("Directory decrypted_files already exists")
         except Exception as e:
-            print("Uknown error occurred.....") 
+            print("Unknown error occurred.....") 
 
         self.__decrypted_file_directory = decrypted_file_directory
 

@@ -6,3 +6,4 @@ import unittest
 import keyboard
 import time
 import zipfile
+import tarfile

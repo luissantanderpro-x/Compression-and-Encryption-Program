@@ -58,7 +58,7 @@ class TestCryptoEngines(unittest.TestCase):
 
         expected_file = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files', 'things.zip')
 
-        comp_engine.compress_directory_to_zip(file_path_of_file_to_be_compressed)
+        comp_engine.compress_to_zip(file_path_of_file_to_be_compressed)
 
         self.assertTrue(os.path.exists(expected_file)) 
 
@@ -69,9 +69,13 @@ class TestCryptoEngines(unittest.TestCase):
 
         print('Current Working Directory: %s' % CURRENT_WORKING_DIRECTORY)
 
-        file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'tests', 'dummy_data', '') 
+        file_path = os.path.join(CURRENT_WORKING_DIRECTORY, 'dummy_data', 'things')
 
-        self.assertTrue(True) 
+        expected_created_file = os.path.join(CURRENT_WORKING_DIRECTORY, 'compressed_files', 'things.tar.gz') 
+
+        comp_engine.compress_to_tar(file_path)
+
+        self.assertTrue(os.path.exists(expected_created_file)) 
 
     # MARK: - Encryption Test
 

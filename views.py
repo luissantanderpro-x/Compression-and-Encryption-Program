@@ -215,8 +215,6 @@ class CompressionEngineTerminalUIView(TerminalView):
         print(f"result: {result}")
         input("press enter to proceed forward\n:") 
 
-    # MARK: - TESTING BREAKPOINT [1]
-
     '''for testing private function __compress_file_to_rar_prompt'''
     def test_compress_file_to_rar_localized_func(self, test_file_path: str): 
         return self._get_file_path_from_directories_file_tree(test_file_path, templates['compression_select_file'])
@@ -232,7 +230,7 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         file_path = UtilityEngine.process_path(file_path) 
 
-        result = self.engine.compress_directory_to_zip(file_path) 
+        result = self.engine.compress_to_zip(file_path) 
 
         print(f'result: {result}')
         input('press enter to proceed forward\n:')
@@ -270,16 +268,16 @@ class CompressionEngineTerminalUIView(TerminalView):
         compression_template = templates['compression_yes_or_no_options']
         self._prompt_menu_options(compression_template, functions, selected_choice)
 
-        return 2
+        return 3
     
-    def __compress_file_to_zip_prompt(self):
+    def __compress_file_to_zip_prompt(self) -> int: 
         print('zip prompt') 
 
         file_path = self.__get_selected_file_path_prompt() 
 
         functions = {
             0: lambda: self.__compress_file_to_zip(file_path),
-            1: lambda: self._exit(2, 'exiting out of the program') 
+            1: lambda: self._exit(1, 'exiting out of the program') 
         }
 
         compression_template = templates['compression_yes_or_no_options']
@@ -288,13 +286,53 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         self._prompt_menu_options(compression_template, functions, selected_choice) 
 
-        return 2 
+        return 3
+    
+    def __compress_file_to_tar(self, file_path: str):
+        '''
+        Compresses file / directory using tar compression.
+        '''
+        res = -1 
+        current_working_directory = self.engine.get_current_working_directory() 
+
+        self.engine.create_compressed_files_directory(current_working_directory) 
+
+        file_path = UtilityEngine.process_path(file_path) 
+
+        print('TAR compressing please wait..........')
+
+        result = self.engine.compress_to_tar(file_path)
+
+        print(f'result: {result}')
+        input('press enter to proceed forward\n:')
+
+        if (result == 'file compressed successfully...'):
+            res = 1 
+        return res 
+    
+    def __compress_file_to_tar_prompt(self) -> int: 
+        file_path = self.__get_selected_file_path_prompt() 
+
+        functions = {
+            0: lambda: self.__compress_file_to_tar(file_path),
+            1: lambda: self._exit(1, 'exiting tar field') 
+        }
+
+        compression_template = templates['compression_yes_or_no_options']
+
+        selected_choice = [0]
+
+        self._prompt_menu_options(compression_template, functions, selected_choice)
+
+        return 3
+
         
     def __load_functions(self) -> dict: 
         return {
             0: self.__compress_file_to_rar_prompt,
             1: self.__compress_file_to_zip_prompt, 
-            2: lambda: self._exit(2, "exiting compression engine....")
+            2: self.__compress_file_to_tar_prompt,
+            3: lambda: self._exit(3, "exiting compression engine....")
         }
 
     def init_prompt(self): 
