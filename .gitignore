@@ -7,5 +7,5 @@ secret.txt
 /compressed_files/
 /encrypted_files/
 /decrypted_files/
-!/dummy_data/nothing.txt
 /dummy_data/*
+!/dummy_data/nothing.txt
