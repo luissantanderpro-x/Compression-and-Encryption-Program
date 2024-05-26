@@ -210,7 +210,7 @@ class CompressionEngineTerminalUIView(TerminalView):
 
         file_path = UtilityEngine.process_path(file_path) 
 
-        result = self.engine.compress_directory_to_rar(file_path)
+        result = self.engine.compress_to_rar(file_path)
 
         print(f"result: {result}")
         input("press enter to proceed forward\n:") 

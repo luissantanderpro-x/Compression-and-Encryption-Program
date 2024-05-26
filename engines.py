@@ -20,6 +20,7 @@ class CryptoEngine():
         pass
 
     def get_salt_from_config_file(self, file_path: str) -> bytes: 
+        '''gets salt value from the encrypted file'''
         salt_value = b'' 
         with open(file_path, 'rb') as file: 
             salt_value = file.readline() 
@@ -67,9 +68,11 @@ class CompressionEngine(CryptoEngine):
         pass 
 
     def get_current_working_directory(self) -> str: 
+        '''gets the current working directory path'''
         return os.getcwd() 
 
     def create_compressed_files_directory(self, directory_path):
+        '''creates a compression directory if one does not exist already.'''
         compressed_file_directory = os.path.join(directory_path, 'compressed_files')
         try: 
             os.mkdir(compressed_file_directory)
@@ -78,10 +81,10 @@ class CompressionEngine(CryptoEngine):
         except Exception as e:
             print("Unknown error occurred.....") 
             
-    def compress_directory_to_rar(self, file_path_of_file_to_compress: str) -> str:
+    def compress_to_rar(self, file_path_of_file_to_compress: str) -> str:
         '''RAR compresses a file or directory.'''
-
         result = "file compressed successfully...." 
+
         if (UtilityEngine.check_if_path_exists(file_path_of_file_to_compress)):
             output_rar_file_name = f"{UtilityEngine.get_file_name_out_of_path(file_path_of_file_to_compress)}.rar"
             output_rar_file_path_placement = os.path.join(os.getcwd(), 'compressed_files', output_rar_file_name)
@@ -127,6 +130,7 @@ class CompressionEngine(CryptoEngine):
     
     @staticmethod
     def is_file_rar_compressed(file_name: str) -> bool: 
+        '''checks if file has .rar extension.'''
         return '.rar' in file_name
     
 # MARK: - Encryption Engine
@@ -135,7 +139,8 @@ class EncryptionEngine(CryptoEngine):
     def __init__(self):
         super().__init__()
 
-    def create_encrypted_files_directory(self):
+    def create_encrypted_files_directory(self) -> str: 
+        '''creates a encrypted files directory if one doesn't exist yet already.'''
         encrypted_file_directory = os.path.join(os.getcwd(), 'encrypted_files')
 
         try: 
@@ -152,6 +157,7 @@ class EncryptionEngine(CryptoEngine):
         return cipher.encrypt(data_bytes) 
 
     def encrypt_password(self, password: str) -> bytes:
+        '''encrypts a password string and returns it's hashed bytes.'''
         salt_value = self.get_salt_from_config_file(r'secret.txt')
 
         password_bytes = UtilityEngine.transform_to_utf_8_bytes_string(password) 
@@ -217,7 +223,8 @@ class DecryptionEngine(CryptoEngine):
     def get_decrypted_file_directory(self) -> str: 
         return self.__decrypted_file_directory
 
-    def create_decrypted_files_directory(self):
+    def create_decrypted_files_directory(self) -> None: 
+        '''creates a decrypted_files directory if one does not exist already.'''
         decrypted_file_directory = os.path.join(os.getcwd(), 'decrypted_files')
 
         try: 
@@ -246,16 +253,19 @@ class DecryptionEngine(CryptoEngine):
         return self.decrypt_data(password_bytes, data_bytes).decode('utf-8')
 
     def decrypt_file_extension(self, file_name: str):
+        '''decrypts file extension.'''
         return StringUtilities.replace_char_at_index(file_name, -4, '.') 
 
     def decrypt_file_name(self, encrypted_file_name: str) -> str: 
+        '''decrypts the encrypted file name back to it's original naming.'''
         file_name = self.decrypt_file_extension(encrypted_file_name) 
         decrypted_file_name = self.caesars_cipher_decrypt(file_name) 
-        
         return decrypted_file_name
 
     def decrypt_file(self, password: bytes, encrypted_file_path: str) -> bool:
         """Decrypts file and outputs it to decrypted_files directory"""
+
+        print('Decrypting file please wait.......')
 
         decrypted_directory_path = self.create_decrypted_files_directory()
         decrypted_directory_path = UtilityEngine.process_path(decrypted_directory_path)
