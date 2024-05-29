@@ -39,7 +39,6 @@ class CryptoEngine():
 
         key = kdf.derive(password)
         cipher = Fernet(base64.urlsafe_b64encode(key))
-
         return cipher.encrypt(data) 
     
     def caesars_cipher_encrypt(self, string_data, shift=3): 
@@ -58,6 +57,7 @@ class CryptoEngine():
         return encrypted_text
     
     def caesars_cipher_decrypt(self, string_data, shift=3): 
+        '''decrypt using caesars cipher.'''
         decrypted_text = self.caesars_cipher_encrypt(string_data, shift * -1)
         return decrypted_text
     
@@ -176,6 +176,7 @@ class EncryptionEngine(CryptoEngine):
         return hashed_password
     
     def encrypt_file_extension(self, file_name: str): 
+        '''encrypts the file extension so it get's masked'''
         return StringUtilities.replace_char_at_index(file_name, -4, 'u') 
     
     def encrypt_file_name(self, file_name: str): 
